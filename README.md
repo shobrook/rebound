@@ -1,2 +1,2 @@
-# rebound
-Command-line tool that automatically displays Stack Overflow results when you get an error
+# Rebound
+A command-line tool that automatically searches Stack Overflow when you get an error.
