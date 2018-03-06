@@ -1,6 +1,7 @@
 # Globals #
 
 
+import re
 import sys
 from bs4 import BeautifulSoup
 import requests
@@ -47,7 +48,7 @@ def get_search_results(soup):
         else:
             answers = 0
 
-            search_results.append({"Title": title, "Body": body, "URL": url, "Votes": votes, "Answers": answers})
+        search_results.append({"Title": title, "Body": body, "URL": url, "Votes": votes, "Answers": answers})
 
     return search_results
 
@@ -58,11 +59,11 @@ def get_search_results(soup):
 def execute(command):
     process = Popen(command.split(), cwd=None, shell=False, close_fds=True, stdout=PIPE, stderr=PIPE, bufsize=1)
 
-    outs, errs = [], []
+    output, errors = [], []
     queue = Queue()
 
-    stdout_thread = Thread(target=read, args=(process.stdout, [queue.put, outs.append]))
-    stderr_thread = Thread(target=read, args=(process.stderr, [queue.put, errs.append]))
+    stdout_thread = Thread(target=read, args=(process.stdout, [queue.put, output.append]))
+    stderr_thread = Thread(target=read, args=(process.stderr, [queue.put, errors.append]))
     writer_thread = Thread(target=write, args=(queue.get,))
 
     for thread in (stdout_thread, stderr_thread, writer_thread):
@@ -76,56 +77,55 @@ def execute(command):
 
     queue.put(None)
 
-    outs = " ".join(outs)
-    errs = " ".join(errs)
+    output = " ".join(output)
+    errors = " ".join(errors)
 
-    """
-    outs, errs = process.communicate()
-    outs = "" if outs == None else outs.decode("utf-8")
-    errs = "" if errs == None else errs.decode("utf-8")
-    """
-
-    return (outs, errs)
+    return (output, errors)
 
 
 def get_language(command):
-    """Parses the command """
     if "python" in command.lower():
         return "python"
     elif "ruby" in command.lower():
         return "ruby"
     elif "java" or "javac" in command.lower():
         return "java"
-    elif "make" or ".cpp" in command.lower():
-        return "c++"
-    elif "./" in command.lower():
-        return "c++"
     elif ".js" in command.lower():
         return "javascript"
     else:
-        "" # No language detected
+        return "" # No language detected
 
 
-def get_error_message(error, language):
-    # TODO: Write this
+def get_error_message(error, language=""):
     if error == "":
         return None
+    #elif language == "python":
+        # TODO: Use RegEx to isolate error message; filter code snippets and tracebacks
+    #elif language == "ruby":
+    #elif language == "java":
+    #elif language == "javascript":
+    #else:
 
 
 def search_stackoverflow(query, page_num):
     url = SO_URL + "/search?page={}&q={}".format(page_num, query.replace(" ", "+"))
-    html = requests.get(url).text
-    soup = BeautifulSoup(html, "lxml")
+    html = requests.get(url)
+    soup = BeautifulSoup(html.text, "lxml")
 
-    # TODO: Handle captchas
+    # TODO: Randomize the user agent
+
+    if re.search("\.com/nocaptcha", html.url):
+        # QUESTION: Can we solve the captcha with Selenium? The checkbox is in an iframe, so theoretically we could target the captcha container, switch into the iframe, target the checkbox and call .click(), and then switch back to SO
+
+        return (None, True, True)
 
     search_results = get_search_results(soup)
 
     # Checks if we're on the last page
     page_nav_container = soup.find_all("div", class_="pager fl")[0]
     if page_nav_container == []:
-        return (search_results, True)
+        return (search_results, True, False)
     elif page_nav_container.find_all("span", class_="page-numbers next") == []:
-        return (search_results, True)
+        return (search_results, True, False)
     else:
-        return (search_results, False)
+        return (search_results, False, False)
