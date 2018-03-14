@@ -88,9 +88,7 @@ def get_language(command):
         return "python"
     elif "ruby" in command.lower():
         return "ruby"
-    elif "java" or "javac" in command.lower():
-        return "java"
-    elif ".js" in command.lower():
+    elif "node" or ".js" in command.lower():
         return "javascript"
     else:
         return "" # No language detected
@@ -100,10 +98,12 @@ def get_error_message(error, language=""):
     if error == "":
         return None
     elif language == "python":
-        if any(exception in error for exception in ["KeyboardInterrupt", "SystemExit", "GeneratorExit"]):
+        if any(e in error for e in ["KeyboardInterrupt", "SystemExit", "GeneratorExit"]):
             return None
         else:
             return error.split("\n")[-2][1:]
+    elif language == "javascript":
+        return error.split("\n")[4][1:]
 
 
 def search_stackoverflow(query, page_num):
