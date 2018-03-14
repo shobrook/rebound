@@ -99,12 +99,11 @@ def get_language(command):
 def get_error_message(error, language=""):
     if error == "":
         return None
-    #elif language == "python":
-        # TODO: Use RegEx to isolate error message; filter code snippets and tracebacks
-    #elif language == "ruby":
-    #elif language == "java":
-    #elif language == "javascript":
-    #else:
+    elif language == "python":
+        if any(exception in error for exception in ["KeyboardInterrupt", "SystemExit", "GeneratorExit"]):
+            return None
+        else:
+            return error.split("\n")[-2][1:]
 
 
 def search_stackoverflow(query, page_num):
