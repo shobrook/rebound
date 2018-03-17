@@ -1,6 +1,7 @@
 # Globals #
 
 
+import urwid
 import re
 import sys
 from bs4 import BeautifulSoup
@@ -53,6 +54,25 @@ def get_search_results(soup):
     return search_results
 
 
+def toText(search_result):
+    # TODO: Stylize the text
+    return urwid.Text("(%s Votes | %s Answers) %s \n %s" % (search_result["Votes"], search_result["Answers"], search_result["Title"], search_result["Body"]))
+
+
+def handle_input(input):
+    if input in ('q', 'Q'):
+        raise urwid.ExitMainLoop()
+    elif input == 'up':
+        focus_widget, idx = content_container.get_focus()
+        if idx > 0:
+            idx = idx - 1
+            content_container.set_focus(idx)
+    elif input == 'down':
+        focus_widget, idx = content_container.get_focus()
+        idx = idx + 1
+        content_container.set_focus(idx)
+
+
 # Main #
 
 
@@ -83,19 +103,19 @@ def execute(command):
     return (output, errors)
 
 
-def get_language(command):
-    if "python" in command.lower():
+def get_language(file_path):
+    if ".py" in file_path.lower():
         return "python"
-    elif "ruby" in command.lower():
-        return "ruby"
-    elif "node" or ".js" in command.lower():
+    elif ".js" in file_path.lower():
         return "javascript"
+    elif ".rb" in file_path.lower():
+        return "ruby"
     else:
-        return "" # No language detected
+        return "" # Unknown language
 
 
-def get_error_message(error, language=""):
-    if error == "":
+def get_error_message(error, language):
+    if error == "" or language == "":
         return None
     elif language == "python":
         if any(e in error for e in ["KeyboardInterrupt", "SystemExit", "GeneratorExit"]):
@@ -107,7 +127,7 @@ def get_error_message(error, language=""):
 
 
 def search_stackoverflow(query, page_num):
-    url = SO_URL + "/search?page={}&q={}".format(page_num, query.replace(" ", "+"))
+    url = SO_URL + "/search?page=%s&q=%s" % (page_num, query.replace(" ", "+"))
     html = requests.get(url)
     soup = BeautifulSoup(html.text, "lxml")
 
@@ -128,3 +148,52 @@ def search_stackoverflow(query, page_num):
         return (search_results, True, False)
     else:
         return (search_results, False, False)
+
+
+def query_display_results(question):
+    valid = {"yes": True, "y": True, "ye": True,
+             "no": False, "n": False}
+    prompt = " [Y/n] "
+
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = input().lower()
+        if choice == "":
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
+
+
+def display_results(search_results, query, last_page):
+    palette = [
+      ('titlebar', 'dark red', ''),
+      ('more button', 'dark red', ''),
+      ('refine button', 'dark green', ''),
+      ('quit button', 'dark blue', ''),
+      ('headers', 'white,bold', ''),
+      ('answered', 'dark green', ''),
+      ('click enter', 'dark green', ''),
+      ('reveal focus', 'black', 'dark cyan', 'standout')]
+
+    menu = urwid.Text([
+        u'Press (', ('more button', u'M'), u') to display more results. ',
+        u'Press (', ('refine button', u'R'), u') to refine the search. ',
+        u'Press (', ('quit button', u'Q'), u') to quit.'
+    ])
+
+    header_text = urwid.Text(u"Search results for: %s" % query)
+    header = urwid.AttrMap(header_text, 'titlebar')
+
+    results = [toText(result) for result in search_results]
+    content = urwid.SimpleListWalker([urwid.AttrMap(result, None, "reveal focus") for result in results])
+    #content_container = urwid.Filler(urwid.ListBox(content), valign="top", top=1, bottom=1)
+    content_container = urwid.ListBox(content)
+
+    global content_container
+
+    layout = urwid.Frame(header=header, body=content_container, footer=menu)
+
+    main_loop = urwid.MainLoop(layout, palette, unhandled_input=handle_input)
+    main_loop.run()
