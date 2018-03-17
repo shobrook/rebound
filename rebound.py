@@ -10,10 +10,10 @@ def rebound(file_path):
     error_msg = util.get_error_message(error, language) # Prepares error message for search
 
     if error_msg != None:
-        sys.stdout.write("\n" + os.get_terminal_size().columns * "-") # Display divider
+        sys.stdout.write("\n" + os.get_terminal_size().columns * "-" + "\n") # Display divider
 
         query = "%s %s" % (language, error_msg)
-        search_results, last_page, captcha = util.search_stackoverflow("How to use raw input?", 1)
+        search_results, last_page, captcha = util.search_stackoverflow(query, 1)
 
         if search_results != []:
             if util.query_display_results("Display Stack Overflow results?"):
