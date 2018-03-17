@@ -16,6 +16,14 @@ SO_URL = "https://stackoverflow.com"
 # Helpers #
 
 
+class SelectableText(urwid.Text):
+    def selectable(self):
+        return True
+
+    def keypress(self, size, key):
+        return key
+
+
 def read(pipe, funcs):
     for line in iter(pipe.readline, b""):
         for func in funcs:
@@ -54,23 +62,15 @@ def get_search_results(soup):
     return search_results
 
 
-def toText(search_result):
-    # TODO: Stylize the text
-    return urwid.Text("(%s Votes | %s Answers) %s \n %s" % (search_result["Votes"], search_result["Answers"], search_result["Title"], search_result["Body"]))
+def stylize(search_result):
+    return "(%s Votes | %s Answers) %s \n %s" % (search_result["Votes"], search_result["Answers"], search_result["Title"], search_result["Body"])
 
 
 def handle_input(input):
     if input in ('q', 'Q'):
         raise urwid.ExitMainLoop()
-    elif input == 'up':
-        focus_widget, idx = content_container.get_focus()
-        if idx > 0:
-            idx = idx - 1
-            content_container.set_focus(idx)
-    elif input == 'down':
-        focus_widget, idx = content_container.get_focus()
-        idx = idx + 1
-        content_container.set_focus(idx)
+    elif input == "": # Enter
+        content_container.get_focus()
 
 
 # Main #
@@ -167,6 +167,8 @@ def query_display_results(question):
 
 
 def display_results(search_results, query, last_page):
+    global content_container
+
     palette = [
       ('titlebar', 'dark red', ''),
       ('more button', 'dark red', ''),
@@ -186,12 +188,10 @@ def display_results(search_results, query, last_page):
     header_text = urwid.Text(u"Search results for: %s" % query)
     header = urwid.AttrMap(header_text, 'titlebar')
 
-    results = [toText(result) for result in search_results]
-    content = urwid.SimpleListWalker([urwid.AttrMap(result, None, "reveal focus") for result in results])
+    #results = [toText(result) for result in search_results]
+    content = urwid.SimpleListWalker([urwid.AttrMap(SelectableText(stylize(result)), None, "reveal focus") for result in search_results])
     #content_container = urwid.Filler(urwid.ListBox(content), valign="top", top=1, bottom=1)
     content_container = urwid.ListBox(content)
-
-    global content_container
 
     layout = urwid.Frame(header=header, body=content_container, footer=menu)
 
