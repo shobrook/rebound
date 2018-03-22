@@ -10,7 +10,15 @@ from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
 
-SO_URL = "https://stackoverflow.com"
+SO_URL = "https://stackoverflow.com" # TODO: Change to stackexchange
+
+GREEN = "\033[92m"
+GRAY = "\033[90m"
+BLUE = "\033[36m"
+RED = "\033[31m"
+ENDC = "\033[0m"
+UNDERLINE = "\033[4m"
+BOLD = "\033[1m"
 
 
 # Helpers #
@@ -63,21 +71,28 @@ def get_search_results(soup):
 
 
 def stylize(search_result):
-    return "(%s Votes | %s Answers) %s \n %s" % (search_result["Votes"], search_result["Answers"], search_result["Title"], search_result["Body"])
+    if search_result["Answers"] == 1:
+        return "(%s Answer) %s" % (search_result["Answers"], search_result["Title"])
+    else:
+        return "(%s Answers) %s" % (search_result["Answers"], search_result["Title"])
 
 
 def handle_input(input):
-    if input in ('q', 'Q'):
+    if input in ('r', 'R'):
+        return
+    elif input in ('m', 'M'):
+        return
+    elif input in ('q', 'Q'):
         raise urwid.ExitMainLoop()
-    elif input == "": # Enter
-        content_container.get_focus()
+    elif input == "":
+        return
 
 
 # Main #
 
 
 def execute(command):
-    process = Popen(command.split(), cwd=None, shell=False, close_fds=True, stdout=PIPE, stderr=PIPE, bufsize=1)
+    process = Popen(command, cwd=None, shell=False, close_fds=True, stdout=PIPE, stderr=PIPE, bufsize=1)
 
     output, errors = [], []
     queue = Queue()
@@ -105,7 +120,7 @@ def execute(command):
 
 def get_language(file_path):
     if ".py" in file_path.lower():
-        return "python"
+        return "python3"
     elif ".js" in file_path.lower():
         return "javascript"
     elif ".rb" in file_path.lower():
@@ -117,7 +132,7 @@ def get_language(file_path):
 def get_error_message(error, language):
     if error == "" or language == "":
         return None
-    elif language == "python":
+    elif language == "python3":
         if any(e in error for e in ["KeyboardInterrupt", "SystemExit", "GeneratorExit"]):
             return None
         else:
@@ -150,50 +165,57 @@ def search_stackoverflow(query, page_num):
         return (search_results, False, False)
 
 
-def query_display_results(question):
+def confirm(question):
     valid = {"yes": True, "y": True, "ye": True,
-             "no": False, "n": False}
+             "no": False, "n": False, "": True}
     prompt = " [Y/n] "
 
     while True:
-        sys.stdout.write(question + prompt)
+        sys.stdout.write(BOLD + BLUE + question + prompt + ENDC)
         choice = input().lower()
-        if choice == "":
-            return valid[default]
-        elif choice in valid:
+        if choice in valid:
             return valid[choice]
-        else:
-            sys.stdout.write("Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
+
+        sys.stdout.write("Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
 
 
-def display_results(search_results, query, last_page):
+def display_first_result(result, query):
+    if result["Answers"] == 1:
+        answers = GREEN + "(1 Answer)" + ENDC
+    elif result["Answers"] > 0 and result["Answers"] != 1:
+        answers = GREEN + "(%s Answers)" + ENDC % str(result["Answers"])
+    else:
+        answers =  "(%s Answers)" % str(result["Answers"])
+
+    title = "\n" + BOLD + answers + BOLD + " " + result["Title"] + ENDC + "\n"
+    body = "\n" + GRAY + result["Body"].strip().replace("\n", " ").replace("\r", "").replace("\t", " ") + ENDC + "\n"
+
+    sys.stdout.write(title)
+    sys.stdout.write(body)
+
+
+def display_all_results(search_results, query, count, last_page):
+    # TODO: Turn this all into a class (so we don't have global variables and shit)
+
     global content_container
+    global palette
 
     palette = [
-      ('titlebar', 'dark red', ''),
-      ('more button', 'dark red', ''),
-      ('refine button', 'dark green', ''),
-      ('quit button', 'dark blue', ''),
-      ('headers', 'white,bold', ''),
-      ('answered', 'dark green', ''),
-      ('click enter', 'dark green', ''),
+      ('menu', 'black', 'dark cyan', 'standout'),
       ('reveal focus', 'black', 'dark cyan', 'standout')]
 
     menu = urwid.Text([
-        u'Press (', ('more button', u'M'), u') to display more results. ',
-        u'Press (', ('refine button', u'R'), u') to refine the search. ',
-        u'Press (', ('quit button', u'Q'), u') to quit.'
+        u'\n',
+        ('menu', u' ENTER '), ('light gray', u" Open link "),
+        ('menu', u' Q '), ('light gray', u" Quit"),
     ])
 
-    header_text = urwid.Text(u"Search results for: %s" % query)
-    header = urwid.AttrMap(header_text, 'titlebar')
-
-    #results = [toText(result) for result in search_results]
-    content = urwid.SimpleListWalker([urwid.AttrMap(SelectableText(stylize(result)), None, "reveal focus") for result in search_results])
+    results = list(map(lambda result: urwid.AttrMap(SelectableText(stylize(result)), None, "reveal focus"), search_results))
+    content = urwid.SimpleListWalker(results)
     #content_container = urwid.Filler(urwid.ListBox(content), valign="top", top=1, bottom=1)
     content_container = urwid.ListBox(content)
 
-    layout = urwid.Frame(header=header, body=content_container, footer=menu)
+    layout = urwid.Frame(body=content_container, footer=menu)
 
     main_loop = urwid.MainLoop(layout, palette, unhandled_input=handle_input)
     main_loop.run()
