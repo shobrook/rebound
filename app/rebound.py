@@ -5,7 +5,7 @@ import webbrowser
 
 
 def rebound(command):
-    language = util.get_language(command[0]) # Gets the language name
+    language = util.get_language(command[0].lower()) # Gets the language name
     output, error = util.execute([language] + command[0:]) # Executes the command and pipes stdout
     error_msg = util.get_error_message(error, language) # Prepares error message for search
 
@@ -17,11 +17,11 @@ def rebound(command):
             if captcha:
                 sys.stdout.write("\n" + util.RED + "Sorry, Stack Overflow blocked our request. Try again in a minute." + util.ENDC)
             elif util.confirm("\nDisplay Stack Overflow results?"):
-                sys.stdout.write("\n" + util.GRAY + os.get_terminal_size().columns * "-" + util.ENDC + "\n") # TODO: Make this fancier and responsive
+                sys.stdout.write("\n" + util.GRAY + os.get_terminal_size().columns * "-" + util.ENDC + "\n") # TODO: Make this responsive
 
                 util.display_first_result(search_results[0], query)
 
-                sys.stdout.write("\n" + util.BOLD + util.BLUE + "Press ENTER for more choices, B to open in your browser, and any other key to quit: " + util.ENDC)
+                sys.stdout.write("\n" + util.BOLD + util.BLUE + "Press ENTER for more choices, B to open in your browser, or any other key to quit: " + util.ENDC)
                 key = input().lower()
                 if key == "":
                     util.display_all_results(search_results, query, 1, last_page)
