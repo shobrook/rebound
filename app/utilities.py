@@ -2,7 +2,6 @@
 
 
 # TODO: Truncate ListBox items
-# TODO: Fully populate the ListBox (with all search results, not just first page, but up to a max)
 
 import urwid
 import re
@@ -209,7 +208,7 @@ def display_first_result(result, query):
     sys.stdout.write(body)
 
 
-def display_all_results(search_results, query, count, last_page):
+def display_all_results(search_results, query):
     # TODO: Turn this all into a class with only local variables instead of globals; Python more efficiently accesses local variables than globals
 
     global glob_search_results
