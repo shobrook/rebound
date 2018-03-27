@@ -1,6 +1,9 @@
 # Globals #
 
 
+# TODO: Truncate ListBox items
+# TODO: Fully populate the ListBox (with all search results, not just first page, but up to a max)
+
 import urwid
 import re
 import sys
@@ -9,6 +12,7 @@ import requests
 from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
+import webbrowser
 
 SO_URL = "https://stackoverflow.com" # TODO: Change to stackexchange
 
@@ -27,6 +31,7 @@ BOLD = "\033[1m"
 class SelectableText(urwid.Text):
     def selectable(self):
         return True
+
 
     def keypress(self, size, key):
         return key
@@ -78,14 +83,18 @@ def stylize(search_result):
 
 
 def handle_input(input):
-    if input in ('r', 'R'):
-        return
-    elif input in ('m', 'M'):
-        return
-    elif input in ('q', 'Q'):
+    if input == "enter": # Open link
+        focus_widget, idx = content_container.get_focus()
+        title = focus_widget.base_widget.text
+
+        for result in glob_search_results:
+            if title == stylize(result):
+                webbrowser.open(result["URL"])
+                break
+
         raise urwid.ExitMainLoop()
-    elif input == "":
-        return
+    elif input in ('q', 'Q'): # Quit
+        raise urwid.ExitMainLoop()
 
 
 # Main #
@@ -119,12 +128,14 @@ def execute(command):
 
 
 def get_language(file_path):
-    if ".py" in file_path.lower():
-        return "python3"
-    elif ".js" in file_path.lower():
+    if ".py" in file_path:
+        return "python"
+    elif ".js" in file_path:
         return "javascript"
-    elif ".rb" in file_path.lower():
+    elif ".rb" in file_path:
         return "ruby"
+    elif ".java" in file_path:
+        return "java"
     else:
         return "" # Unknown language
 
@@ -132,13 +143,17 @@ def get_language(file_path):
 def get_error_message(error, language):
     if error == "" or language == "":
         return None
-    elif language == "python3":
+    elif language == "python":
         if any(e in error for e in ["KeyboardInterrupt", "SystemExit", "GeneratorExit"]):
             return None
         else:
             return error.split("\n")[-2][1:]
     elif language == "javascript":
         return error.split("\n")[4][1:]
+    elif language == "ruby":
+        return
+    elif language == "java":
+        return
 
 
 def search_stackoverflow(query, page_num):
@@ -149,7 +164,7 @@ def search_stackoverflow(query, page_num):
     # TODO: Randomize the user agent
 
     if re.search("\.com/nocaptcha", html.url):
-        # QUESTION: Can we solve the captcha with Selenium? The checkbox is in an iframe, so theoretically we could target the captcha container, switch into the iframe, target the checkbox and call .click(), and then switch back to SO
+        # IDEA: We might be able to solve the captcha with Selenium. The checkbox is in an iframe, so theoretically we could target the captcha container, switch into the iframe, target the checkbox and call .click(), and then switch back to SO.
 
         return (None, True, True)
 
@@ -195,20 +210,22 @@ def display_first_result(result, query):
 
 
 def display_all_results(search_results, query, count, last_page):
-    # TODO: Turn this all into a class (so we don't have global variables and shit)
+    # TODO: Turn this all into a class with only local variables instead of globals; Python more efficiently accesses local variables than globals
 
+    global glob_search_results
     global content_container
     global palette
 
     palette = [
       ('menu', 'black', 'dark cyan', 'standout'),
       ('reveal focus', 'black', 'dark cyan', 'standout')]
-
     menu = urwid.Text([
         u'\n',
         ('menu', u' ENTER '), ('light gray', u" Open link "),
         ('menu', u' Q '), ('light gray', u" Quit"),
     ])
+
+    glob_search_results = search_results.copy()
 
     results = list(map(lambda result: urwid.AttrMap(SelectableText(stylize(result)), None, "reveal focus"), search_results))
     content = urwid.SimpleListWalker(results)
