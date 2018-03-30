@@ -1,4 +1,4 @@
-## Globals ##
+## GLOBALS ##
 
 
 import urwid
@@ -12,7 +12,7 @@ from threading import Thread
 import webbrowser
 import time
 
-SO_URL = "https://stackoverflow.com" # QUESTION: Use Stack Overflow or Stack Exchange?
+SO_URL = "https://stackoverflow.com"
 
 GREEN = '\033[92m'
 GRAY = '\033[90m'
@@ -23,7 +23,7 @@ UNDERLINE = '\033[4m'
 BOLD = '\033[1m'
 
 
-## File Execution ##
+## FILE EXECUTION ##
 
 
 # Helper Functions #
@@ -86,7 +86,7 @@ def execute(command):
     return (output, errors)
 
 
-## File Attributes ##
+## FILE ATTRIBUTES ##
 
 
 def get_language(file_path):
@@ -105,7 +105,7 @@ def get_language(file_path):
 
 def get_error_message(error, language):
     """Filters the traceback from stderr and returns only the error message."""
-    if error == "" or language == "":
+    if error == "":
         return None
     elif language == "python":
         if any(e in error for e in ["KeyboardInterrupt", "SystemExit", "GeneratorExit"]): # Non-compiler errors
@@ -120,7 +120,7 @@ def get_error_message(error, language):
         return # TODO
 
 
-## Stack Overflow Scraper ##
+## SCRAPING ##
 
 
 # Helper Functions #
@@ -204,7 +204,7 @@ def get_question_and_answers(url):
     return question_title, question_desc, question_stats, answers
 
 
-## App ##
+## INTERFACE ##
 
 
 # Helper Classes #
@@ -232,17 +232,17 @@ class App(object):
         self.menu = urwid.Text([
             u'\n',
             ("menu", u" ENTER "), ("light gray", u" View answers "),
-            ("menu", u" SPACE "), ("light gray", u" Open link "),
-            ("menu", u" ESC "), ("light gray", u" Close window"),
+            ("menu", u" SPACE "), ("light gray", u" Open browser "),
+            ("menu", u" Q "), ("light gray", u" Quit"),
         ])
 
-        results = list(map(lambda result: urwid.AttrMap(SelectableText(self.__stylize_title(result)), None, "reveal focus"), search_results))
+        results = list(map(lambda result: urwid.AttrMap(SelectableText(self.__stylize_title(result)), None, "reveal focus"), self.search_results)) # TODO: Truncate each item to one line
         content = urwid.SimpleListWalker(results)
         self.content_container = urwid.ListBox(content)
-        self.layout = urwid.Frame(body=self.content_container, footer=self.menu)
+        layout = urwid.Frame(body=self.content_container, footer=self.menu)
 
-        self.main_loop = urwid.MainLoop(self.layout, self.palette, unhandled_input=self.__handle_input)
-        self.parent_widget = self.main_loop.widget
+        self.main_loop = urwid.MainLoop(layout, self.palette, unhandled_input=self.__handle_input)
+        self.original_widget = self.main_loop.widget
 
         self.main_loop.run()
 
@@ -262,8 +262,14 @@ class App(object):
                     padding = urwid.Padding(filler, left=1, right=1)
                     linebox = urwid.LineBox(padding)
 
-                    self.main_loop.widget = urwid.Overlay(linebox, self.layout, "center", 85, "middle", 23)
+                    menu = urwid.Text([
+                        u'\n',
+                        ("menu", u" SPACE "), ("light gray", u" Open browser "),
+                        ("menu", u" ESC "), ("light gray", u" Go back "),
+                        ("menu", u" Q "), ("light gray", u" Quit"),
+                    ])
 
+                    self.main_loop.widget = urwid.Frame(body=urwid.Overlay(linebox, self.content_container, "center", 85, "middle", 23), footer=menu)
                     break
         elif input == ' ': # Open link
             focus_widget, idx = self.content_container.get_focus()
@@ -272,15 +278,17 @@ class App(object):
             for result in self.search_results:
                 if title == self.__stylize_title(result):
                     webbrowser.open(result["URL"])
-                    raise urwid.ExitMainLoop()
 
+                    raise urwid.ExitMainLoop()
                     break
         elif input == "esc": # Close window
             if self.viewing_answers:
-                self.main_loop.widget = self.parent_widget
+                self.main_loop.widget = self.original_widget
                 self.viewing_answers = False
             else:
                 raise urwid.ExitMainLoop()
+        elif input in ('q', 'Q'): # Quit
+            raise urwid.ExitMainLoop()
 
 
     def __stylize_title(self, search_result):
@@ -302,7 +310,7 @@ class App(object):
         return urwid.Text(answer) # TODO: Highlight code blocks
 
 
-## Miscellaneous ##
+## MISCELLANEOUS ##
 
 
 def confirm(question):
