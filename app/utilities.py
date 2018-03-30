@@ -1,7 +1,5 @@
-# Globals #
+## Globals ##
 
-
-# TODO: Truncate ListBox items
 
 import urwid
 import re
@@ -12,6 +10,7 @@ from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
 import webbrowser
+import time
 
 SO_URL = "https://stackoverflow.com" # TODO: Change to stackexchange
 
@@ -24,16 +23,10 @@ UNDERLINE = "\033[4m"
 BOLD = "\033[1m"
 
 
-# Helpers #
+## File Execution ##
 
 
-class SelectableText(urwid.Text):
-    def selectable(self):
-        return True
-
-
-    def keypress(self, size, key):
-        return key
+# Helper Functions #
 
 
 def read(pipe, funcs):
@@ -46,54 +39,6 @@ def read(pipe, funcs):
 def write(get):
     for line in iter(get, None):
         sys.stdout.write(line)
-
-
-def get_search_results(soup):
-    search_results = []
-
-    search_results_container = soup.find_all("div", class_="search-results js-search-results")[0]
-    for search_result in search_results_container.find_all("div", class_="question-summary search-result"):
-        title_container = search_result.find_all("div", class_="result-link")[0].find_all("span")[0].find_all("a")[0]
-
-        title = title_container["title"]
-        body = search_result.find_all("div", class_="excerpt")[0].text
-        url = SO_URL + title_container["href"]
-        votes = int(search_result.find_all("span", class_="vote-count-post ")[0].find_all("strong")[0].text)
-
-        if search_result.find_all("div", class_="status answered") != []:
-            answers = int(search_result.find_all("div", class_="status answered")[0].find_all("strong")[0].text)
-        elif search_result.find_all("div", class_="status unanswered") != []:
-            answers = int(search_result.find_all("div", class_="status unanswered")[0].find_all("strong")[0].text)
-        elif search_result.find_all("div", class_="status answered-accepted") != []:
-            answers = int(search_result.find_all("div", class_="status answered-accepted")[0].find_all("strong")[0].text)
-        else:
-            answers = 0
-
-        search_results.append({"Title": title, "Body": body, "URL": url, "Votes": votes, "Answers": answers})
-
-    return search_results
-
-
-def stylize(search_result):
-    if search_result["Answers"] == 1:
-        return "(%s Answer) %s" % (search_result["Answers"], search_result["Title"])
-    else:
-        return "(%s Answers) %s" % (search_result["Answers"], search_result["Title"])
-
-
-def handle_input(input):
-    if input == "enter": # Open link
-        focus_widget, idx = content_container.get_focus()
-        title = focus_widget.base_widget.text
-
-        for result in glob_search_results:
-            if title == stylize(result):
-                webbrowser.open(result["URL"])
-                break
-
-        raise urwid.ExitMainLoop()
-    elif input in ('q', 'Q'): # Quit
-        raise urwid.ExitMainLoop()
 
 
 # Main #
@@ -126,6 +71,9 @@ def execute(command):
     return (output, errors)
 
 
+## File Attributes ##
+
+
 def get_language(file_path):
     if ".py" in file_path:
         return "python"
@@ -155,65 +103,184 @@ def get_error_message(error, language):
         return
 
 
-def search_stackoverflow(query, page_num):
-    url = SO_URL + "/search?page=%s&q=%s" % (page_num, query.replace(" ", "+"))
-    html = requests.get(url)
-    soup = BeautifulSoup(html.text, "lxml")
+## Stack Overflow Scraper ##
 
-    # TODO: Randomize the user agent
+
+# Helper Functions #
+
+
+def get_search_results(soup):
+    search_results = []
+
+    search_results_container = soup.find_all("div", class_="search-results js-search-results")[0]
+    for search_result in search_results_container.find_all("div", class_="question-summary search-result"):
+        title_container = search_result.find_all("div", class_="result-link")[0].find_all("span")[0].find_all("a")[0]
+
+        title = title_container["title"]
+        body = search_result.find_all("div", class_="excerpt")[0].text
+        url = SO_URL + title_container["href"]
+        votes = int(search_result.find_all("span", class_="vote-count-post ")[0].find_all("strong")[0].text)
+
+        if search_result.find_all("div", class_="status answered") != []:
+            answers = int(search_result.find_all("div", class_="status answered")[0].find_all("strong")[0].text)
+        elif search_result.find_all("div", class_="status unanswered") != []:
+            answers = int(search_result.find_all("div", class_="status unanswered")[0].find_all("strong")[0].text)
+        elif search_result.find_all("div", class_="status answered-accepted") != []:
+            answers = int(search_result.find_all("div", class_="status answered-accepted")[0].find_all("strong")[0].text)
+        else:
+            answers = 0
+
+        search_results.append({"Title": title, "Body": body, "URL": url, "Votes": votes, "Answers": answers})
+
+    return search_results
+
+
+def souper(url):
+    html = requests.get(url)
 
     if re.search("\.com/nocaptcha", html.url):
         # IDEA: We might be able to solve the captcha with Selenium. The checkbox is in an iframe, so theoretically we could target the captcha container, switch into the iframe, target the checkbox and call .click(), and then switch back to SO.
+        return None
+    else:
+        return BeautifulSoup(html.text, "html.parser")
 
-        return (None, True, True)
+
+"""
+def add_urls(tags):
+    images = tags.find_all("a")
+
+    for image in images:
+        if hasattr(image, "href"):
+            image.string = "{} [{}]".format(image.text, image['href'])
+"""
+
+
+# Main #
+
+
+def search_stackoverflow(query):
+    soup = souper(SO_URL + "/search?page=1&q=%s" % query.replace(" ", "+"))
+
+    # TODO: Randomize the user agent
+
+    if soup == None:
+        return (None, True)
 
     search_results = get_search_results(soup)
 
     # Checks if we're on the last page
     page_nav_container = soup.find_all("div", class_="pager fl")[0]
     if page_nav_container == []:
-        return (search_results, True, False)
+        return (search_results, False)
     elif page_nav_container.find_all("span", class_="page-numbers next") == []:
-        return (search_results, True, False)
+        return (search_results, False)
     else:
-        return (search_results, False, False)
+        time.sleep(2)
+        soup = souper(SO_URL + "/search?page=2&q=%s" % query.replace(" ", "+"))
+
+        if soup == None:
+            return (search_results, True)
+        else:
+            return (search_results + get_search_results(soup), False)
 
 
-def confirm(question):
-    valid = {"yes": True, "y": True, "ye": True,
-             "no": False, "n": False, "": True}
-    prompt = " [Y/n] "
+def get_question_and_answers(url):
+    soup = souper(url)
 
-    while True:
-        sys.stdout.write(BOLD + BLUE + question + prompt + ENDC)
-        choice = input().lower()
-        if choice in valid:
-            return valid[choice]
+    question_title = soup.find_all("a", class_="question-hyperlink")[0].get_text()
+    question_stats = soup.find_all("span", class_="vote-count-post")[0].get_text()
 
-        sys.stdout.write("Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
+    try:
+        question_stats = "Votes " + question_stats + " | " + (((soup.find_all("div", class_="module question-stats")[0].get_text()).replace("\n", " ")).replace("     "," | "))
+    except IndexError:
+        question_stats = "Could not load statistics."
+
+    question_desc = (soup.find_all("div", class_="post-text")[0]).get_text() # TODO: Implement add_urls
+    question_stats = ' '.join(question_stats.split())
+
+    answers = [urwid.Text(answer.get_text()) for answer in soup.find_all("div", class_="post-text")][1:]
+    if len(answers) == 0:
+        answers.append(urwid.Text("No answers for this question."))
+
+    return question_title, question_desc, question_stats, answers
 
 
-def display_first_result(result, query):
-    if result["Answers"] == 1:
-        answers = GREEN + "(1 Answer)" + ENDC
-    elif result["Answers"] > 0 and result["Answers"] != 1:
-        answers = GREEN + "(%s Answers)" + ENDC % str(result["Answers"])
+## Interface ##
+
+
+# Helper Classes #
+
+
+class SelectableText(urwid.Text):
+    def selectable(self):
+        return True
+
+
+    def keypress(self, size, key):
+        return key
+
+
+# Helper Functions #
+
+
+def stylize(search_result):
+    if search_result["Answers"] == 1:
+        return "(%s Answer) %s" % (search_result["Answers"], search_result["Title"])
     else:
-        answers =  "(%s Answers)" % str(result["Answers"])
+        return "(%s Answers) %s" % (search_result["Answers"], search_result["Title"])
 
-    title = "\n" + BOLD + answers + BOLD + " " + result["Title"] + ENDC + "\n"
-    body = "\n" + GRAY + result["Body"].strip().replace("\n", " ").replace("\r", "").replace("\t", " ") + ENDC + "\n"
 
-    sys.stdout.write(title)
-    sys.stdout.write(body)
+def handle_input(input):
+    if input == "enter": # Open question
+        focus_widget, idx = content_container.get_focus()
+        title = focus_widget.base_widget.text
+
+        for result in glob_search_results:
+            if title == stylize(result):
+                question_title, question_desc, question_stats, answers = get_question_and_answers(result["URL"])
+
+                question = urwid.Text(question_desc)
+                answer_pile = urwid.Pile([urwid.Text("test"), urwid.Text("anothertest")])
+                menu = urwid.Text([
+                    u'\n',
+                    (('black', 'dark cyan', 'standout'), u' O '), ('light gray', u" Open link "),
+                    (('black', 'dark cyan', 'standout'), u' B '), ('light gray', u" Back"),
+                ])
+
+                frame = urwid.Frame(body=answer_pile, header=question, footer=menu)
+
+                #text = urwid.Text(answers[0])
+                #filler = urwid.Filler(text, valign="top")
+                #padding = urwid.Padding(filler, left=5, right=5)
+                #linebox = urwid.LineBox(padding)
+
+                main_loop.widget = urwid.Overlay(frame, layout, "center", 100, "middle", 50)
+    elif input in ('o', 'O'): # Open link
+        focus_widget, idx = content_container.get_focus()
+        title = focus_widget.base_widget.text
+
+        for result in glob_search_results:
+            if title == stylize(result):
+                webbrowser.open(result["URL"])
+                break
+
+        raise urwid.ExitMainLoop()
+    elif input in ('q', 'Q'): # Quit
+        raise urwid.ExitMainLoop()
+
+
+# Main #
 
 
 def display_all_results(search_results, query):
     # TODO: Turn this all into a class with only local variables instead of globals; Python more efficiently accesses local variables than globals
+    # TODO: Truncate ListBox items
 
     global glob_search_results
     global content_container
     global palette
+    global layout
+    global main_loop
 
     palette = [
       ('menu', 'black', 'dark cyan', 'standout'),
@@ -235,3 +302,20 @@ def display_all_results(search_results, query):
 
     main_loop = urwid.MainLoop(layout, palette, unhandled_input=handle_input)
     main_loop.run()
+
+
+## Miscellaneous ##
+
+
+def confirm(question):
+    valid = {"yes": True, "y": True, "ye": True,
+             "no": False, "n": False, "": True}
+    prompt = " [Y/n] "
+
+    while True:
+        sys.stdout.write(BOLD + BLUE + question + prompt + ENDC)
+        choice = input().lower()
+        if choice in valid:
+            return valid[choice]
+
+        sys.stdout.write("Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
