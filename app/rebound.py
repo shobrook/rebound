@@ -28,7 +28,7 @@ def rebound(command):
                 sys.stdout.write("\n" + util.RED + "Sorry, Stack Overflow blocked our request. Try again in a minute." + util.END)
                 return
             elif util.confirm("\nDisplay Stack Overflow results?"):
-                return util.display_all_results(search_results, query)
+                return util.App(search_results)
         else:
             sys.stdout.write("\n" + util.RED + "No Stack Overflow results found." + util.END)
 
