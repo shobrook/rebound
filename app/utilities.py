@@ -181,6 +181,8 @@ def search_stackoverflow(query):
 
 def get_question_and_answers(url):
     """Returns details about a given question and list of its answers."""
+    # TODO: Identify <code> tags so codeblocks can be stylized later
+
     soup = souper(url)
 
     question_title = soup.find_all("a", class_="question-hyperlink")[0].get_text()
@@ -202,7 +204,7 @@ def get_question_and_answers(url):
     return question_title, question_desc, question_stats, answers
 
 
-## Interface ##
+## App ##
 
 
 # Helper Classes #
@@ -217,95 +219,94 @@ class SelectableText(urwid.Text):
         return key
 
 
-# Helper Functions #
-
-
-def stylize(search_result):
-    if search_result["Answers"] == 1:
-        return "%s Answer | %s" % (search_result["Answers"], search_result["Title"])
-    else:
-        return "%s Answers | %s" % (search_result["Answers"], search_result["Title"])
-
-
-def handle_input(input):
-    if input == "enter": # Open question
-        focus_widget, idx = content_container.get_focus()
-        title = focus_widget.base_widget.text
-
-        for result in glob_search_results:
-            if title == stylize(result):
-                question_title, question_desc, question_stats, answers = get_question_and_answers(result["URL"])
-
-                question = urwid.Text(question_desc)
-                answer_pile = urwid.Pile([urwid.Text("test"), urwid.Text("anothertest")])
-                menu = urwid.Text([
-                    u'\n',
-                    (("black", "dark cyan", "standout"), u' O '), ("light gray", u" Open link "),
-                    (("black", "dark cyan", "standout"), u' B '), ("light gray", u" Back"),
-                ])
-
-                frame = urwid.Frame(body=answer_pile, header=question, footer=menu)
-
-                #text = urwid.Text(answers[0])
-                #filler = urwid.Filler(text, valign="top")
-                #padding = urwid.Padding(filler, left=5, right=5)
-                #linebox = urwid.LineBox(padding)
-
-                main_loop.widget = urwid.Overlay(frame, layout, "center", 100, "middle", 50)
-    elif input == ' ': # Open link
-        focus_widget, idx = content_container.get_focus()
-        title = focus_widget.base_widget.text
-
-        for result in glob_search_results:
-            if title == stylize(result):
-                webbrowser.open(result["URL"])
-                break
-
-        raise urwid.ExitMainLoop()
-    elif input in ('q', 'Q') or "esc": # Quit
-        raise urwid.ExitMainLoop()
-
-
 # Main #
 
 
-def display_all_results(search_results, query):
-    # TODO: Turn this all into a class with only local variables instead of globals; Python more efficiently accesses local variables than globals
-    # TODO: Truncate ListBox items
+class App(object):
+    def __init__(self, search_results):
+        self.search_results = search_results
+        self.palette = [
+            ('menu', 'black', 'light cyan', 'standout'),
+            ('reveal focus', 'black', 'light cyan', 'standout')
+            ]
+        self.menu = urwid.Text([
+            u'\n',
+            ("menu", u" ENTER "), ("light gray", u" View answers "),
+            ("menu", u" SPACE "), ("light gray", u" Open link "),
+            ("menu", u" ESC "), ("light gray", u" Close window"),
+        ])
 
-    global glob_search_results
-    global content_container
-    global palette
-    global layout
-    global main_loop
+        results = list(map(lambda result: urwid.AttrMap(SelectableText(self.__stylize_title(result)), None, "reveal focus"), search_results))
+        content = urwid.SimpleListWalker(results)
+        self.content_container = urwid.ListBox(content)
+        self.layout = urwid.Frame(body=self.content_container, footer=self.menu)
 
-    palette = [
-      ('menu', 'black', 'light cyan', 'standout'),
-      ('reveal focus', 'black', 'light cyan', 'standout')]
-    menu = urwid.Text([
-        u'\n',
-        ('menu', u' ENTER '), ('light gray', u" View answers "),
-        ('menu', u' SPACE '), ('light gray', u" Open link "),
-        ('menu', u' Q '), ('light gray', u" Quit"),
-    ])
+        self.main_loop = urwid.MainLoop(self.layout, self.palette, unhandled_input=self.__handle_input)
+        self.parent_widget = self.main_loop.widget
 
-    glob_search_results = search_results.copy()
+        self.main_loop.run()
 
-    results = list(map(lambda result: urwid.AttrMap(SelectableText(stylize(result)), None, "reveal focus"), search_results))
-    content = urwid.SimpleListWalker(results)
-    #content_container = urwid.Filler(urwid.ListBox(content), valign="top", top=1, bottom=1)
-    content_container = urwid.ListBox(content)
 
-    layout = urwid.Frame(body=content_container, footer=menu)
+    def __handle_input(self, input):
+        if input == "enter": # View answers
+            focus_widget, idx = self.content_container.get_focus()
+            title = focus_widget.base_widget.text
 
-    main_loop = urwid.MainLoop(layout, palette, unhandled_input=handle_input)
-    main_loop.run()
+            for result in self.search_results:
+                if title == self.__stylize_title(result):
+                    self.viewing_answers = True
+                    question_title, question_desc, question_stats, answers = get_question_and_answers(result["URL"])
+
+                    pile = urwid.Pile(self.__stylize_question(question_title, question_desc, question_stats) + [urwid.Divider('-')] + list(map(lambda answer: self.__stylize_answer(answer), answers)))
+                    filler = urwid.Filler(pile, valign="top")
+                    padding = urwid.Padding(filler, left=1, right=1)
+                    linebox = urwid.LineBox(padding)
+
+                    self.main_loop.widget = urwid.Overlay(linebox, self.layout, "center", 85, "middle", 23)
+
+                    break
+        elif input == ' ': # Open link
+            focus_widget, idx = self.content_container.get_focus()
+            title = focus_widget.base_widget.text
+
+            for result in self.search_results:
+                if title == self.__stylize_title(result):
+                    webbrowser.open(result["URL"])
+                    raise urwid.ExitMainLoop()
+
+                    break
+        elif input == "esc": # Close window
+            if self.viewing_answers:
+                self.main_loop.widget = self.parent_widget
+                self.viewing_answers = False
+            else:
+                raise urwid.ExitMainLoop()
+
+
+    def __stylize_title(self, search_result):
+        if search_result["Answers"] == 1:
+            return "%s Answer | %s" % (search_result["Answers"], search_result["Title"])
+        else:
+            return "%s Answers | %s" % (search_result["Answers"], search_result["Title"])
+
+
+    def __stylize_question(self, title, desc, stats):
+        new_title = urwid.AttrMap(urwid.Text(("light cyan", u"%s\n" % title)), "underline")
+        new_desc = urwid.Text(u"%s\n" % desc) # TODO: Highlight code blocks
+        new_stats = urwid.Text(("light green", u"%s\n" % stats))
+
+        return [new_title, new_desc, new_stats]
+
+
+    def __stylize_answer(self, answer):
+        return urwid.Text(answer) # TODO: Highlight code blocks
 
 
 ## Miscellaneous ##
 
 
 def confirm(question):
+    """Prompts a given question and handles user input."""
     valid = {"yes": True, "y": True, "ye": True,
              "no": False, "n": False, "": True}
     prompt = " [Y/n] "
