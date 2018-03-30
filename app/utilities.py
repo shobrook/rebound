@@ -232,7 +232,7 @@ class App(object):
         self.menu = urwid.Text([
             u'\n',
             ("menu", u" ENTER "), ("light gray", u" View answers "),
-            ("menu", u" SPACE "), ("light gray", u" Open browser "),
+            ("menu", u" B "), ("light gray", u" Open browser "),
             ("menu", u" Q "), ("light gray", u" Quit"),
         ])
 
@@ -264,22 +264,20 @@ class App(object):
 
                     menu = urwid.Text([
                         u'\n',
-                        ("menu", u" SPACE "), ("light gray", u" Open browser "),
                         ("menu", u" ESC "), ("light gray", u" Go back "),
+                        ("menu", u" B "), ("light gray", u" Open browser "),
                         ("menu", u" Q "), ("light gray", u" Quit"),
                     ])
 
                     self.main_loop.widget = urwid.Frame(body=urwid.Overlay(linebox, self.content_container, "center", 85, "middle", 23), footer=menu)
                     break
-        elif input == ' ': # Open link
+        elif input in ('b', 'B'): # Open link
             focus_widget, idx = self.content_container.get_focus()
             title = focus_widget.base_widget.text
 
             for result in self.search_results:
                 if title == self.__stylize_title(result):
                     webbrowser.open(result["URL"])
-
-                    raise urwid.ExitMainLoop()
                     break
         elif input == "esc": # Close window
             if self.viewing_answers:
