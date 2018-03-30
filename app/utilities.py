@@ -16,7 +16,7 @@ SO_URL = "https://stackoverflow.com" # TODO: Change to stackexchange
 
 GREEN = "\033[92m"
 GRAY = "\033[90m"
-BLUE = "\033[36m"
+CYAN = "\033[36m"
 RED = "\033[31m"
 ENDC = "\033[0m"
 UNDERLINE = "\033[4m"
@@ -45,7 +45,15 @@ def write(get):
 
 
 def execute(command):
-    process = Popen(command, cwd=None, shell=False, close_fds=True, stdout=PIPE, stderr=PIPE, bufsize=1)
+    process = Popen(
+        command,
+        cwd=None,
+        shell=False,
+        close_fds=True,
+        stdout=PIPE,
+        stderr=PIPE,
+        bufsize=1
+        )
 
     output, errors = [], []
     queue = Queue()
@@ -159,29 +167,16 @@ def add_urls(tags):
 
 
 def search_stackoverflow(query):
-    soup = souper(SO_URL + "/search?page=1&q=%s" % query.replace(" ", "+"))
+    soup = souper(SO_URL + "/search?pagesize=50&q=%s" % query.replace(" ", "+"))
 
     # TODO: Randomize the user agent
 
     if soup == None:
         return (None, True)
+    else:
+        return (get_search_results(soup), False)
 
     search_results = get_search_results(soup)
-
-    # Checks if we're on the last page
-    page_nav_container = soup.find_all("div", class_="pager fl")[0]
-    if page_nav_container == []:
-        return (search_results, False)
-    elif page_nav_container.find_all("span", class_="page-numbers next") == []:
-        return (search_results, False)
-    else:
-        time.sleep(2)
-        soup = souper(SO_URL + "/search?page=2&q=%s" % query.replace(" ", "+"))
-
-        if soup == None:
-            return (search_results, True)
-        else:
-            return (search_results + get_search_results(soup), False)
 
 
 def get_question_and_answers(url):
@@ -191,14 +186,14 @@ def get_question_and_answers(url):
     question_stats = soup.find_all("span", class_="vote-count-post")[0].get_text()
 
     try:
-        question_stats = "Votes " + question_stats + " | " + (((soup.find_all("div", class_="module question-stats")[0].get_text()).replace("\n", " ")).replace("     "," | "))
+        question_stats = question_stats + " Votes | " + (((soup.find_all("div", class_="module question-stats")[0].get_text()).replace("\n", " ")).replace("     "," | "))
     except IndexError:
         question_stats = "Could not load statistics."
 
     question_desc = (soup.find_all("div", class_="post-text")[0]).get_text() # TODO: Implement add_urls
     question_stats = ' '.join(question_stats.split())
 
-    answers = [urwid.Text(answer.get_text()) for answer in soup.find_all("div", class_="post-text")][1:]
+    answers = [answer.get_text() for answer in soup.find_all("div", class_="post-text")][1:]
     if len(answers) == 0:
         answers.append(urwid.Text("No answers for this question."))
 
@@ -225,9 +220,9 @@ class SelectableText(urwid.Text):
 
 def stylize(search_result):
     if search_result["Answers"] == 1:
-        return "(%s Answer) %s" % (search_result["Answers"], search_result["Title"])
+        return "%s Answer | %s" % (search_result["Answers"], search_result["Title"])
     else:
-        return "(%s Answers) %s" % (search_result["Answers"], search_result["Title"])
+        return "%s Answers | %s" % (search_result["Answers"], search_result["Title"])
 
 
 def handle_input(input):
@@ -255,7 +250,7 @@ def handle_input(input):
                 #linebox = urwid.LineBox(padding)
 
                 main_loop.widget = urwid.Overlay(frame, layout, "center", 100, "middle", 50)
-    elif input in ('o', 'O'): # Open link
+    elif input == " ": # Open link
         focus_widget, idx = content_container.get_focus()
         title = focus_widget.base_widget.text
 
@@ -283,11 +278,12 @@ def display_all_results(search_results, query):
     global main_loop
 
     palette = [
-      ('menu', 'black', 'dark cyan', 'standout'),
-      ('reveal focus', 'black', 'dark cyan', 'standout')]
+      ('menu', 'black', 'light cyan', 'standout'),
+      ('reveal focus', 'black', 'light cyan', 'standout')]
     menu = urwid.Text([
         u'\n',
-        ('menu', u' ENTER '), ('light gray', u" Open link "),
+        ('menu', u' ENTER '), ('light gray', u" View answers "),
+        ('menu', u' SPACE '), ('light gray', u" Open link "),
         ('menu', u' Q '), ('light gray', u" Quit"),
     ])
 
@@ -313,7 +309,7 @@ def confirm(question):
     prompt = " [Y/n] "
 
     while True:
-        sys.stdout.write(BOLD + BLUE + question + prompt + ENDC)
+        sys.stdout.write(BOLD + CYAN + question + prompt + ENDC)
         choice = input().lower()
         if choice in valid:
             return valid[choice]
