@@ -8,7 +8,6 @@ from setuptools.extern.six.moves import configparser
 
 from setuptools import Command
 
-
 __all__ = ['config_file', 'edit_config', 'option_base', 'setopt']
 
 

@@ -18,9 +18,9 @@ def run():
     __builtins__
     script_name = sys.argv[1]
     namespace = dict(
-        __file__ = script_name,
-        __name__ = '__main__',
-        __doc__ = None,
+        __file__=script_name,
+        __name__='__main__',
+        __doc__=None,
     )
     sys.argv[:] = sys.argv[1:]
 

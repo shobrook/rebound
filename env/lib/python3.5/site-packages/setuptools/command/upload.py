@@ -10,6 +10,10 @@ class upload(orig.upload):
 
     def finalize_options(self):
         orig.upload.finalize_options(self)
+        self.username = (
+            self.username or
+            getpass.getuser()
+        )
         # Attempt to obtain password. Short circuit evaluation at the first
         # sign of success.
         self.password = (
