@@ -40,9 +40,9 @@ Rebound is written in Python and built on Urwid. Beautiful Soup is used
 to scrape Stack Overflow content and subprocess is used to catch
 compiler errors.
 
-To make a contribution, clone the repo and create a new branch, make
+To make a contribution, fork the repo, make
 your changes and then submit a pull request. If you’ve discovered a bug
-or have a feature request, create an `issue`_ and tag it respectively.
+or have a feature request, create an `issue`_ and tag it appropriately.
 
 Acknowledgements
 ----------------
