@@ -1,0 +1,4 @@
+BeautifulSoup4
+requests
+urllib3
+urwid

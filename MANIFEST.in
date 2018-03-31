@@ -1,0 +1,2 @@
+recursive-include rebound *
+include LICENSE README.rst requirements.txt

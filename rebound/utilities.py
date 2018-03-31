@@ -30,7 +30,7 @@ BOLD = '\033[1m'
 
 
 def read(pipe, funcs):
-    """Reads piped output to a queue and list."""
+    """Reads and pushes piped output to a queue and list."""
     for line in iter(pipe.readline, b''):
         for func in funcs:
             func(line.decode("utf-8"))
@@ -49,6 +49,7 @@ def write(get):
 def execute(command):
     """Executes a given command and clones stdout/err to both variables and the
     terminal (in real-time)."""
+    # TODO: Handle nonexistent files
     process = Popen(
         command,
         cwd=None,
@@ -100,20 +101,20 @@ def get_language(file_path):
     elif ".java" in file_path:
         return "java"
     else:
-        return "" # Unknown language
+        return '' # Unknown language
 
 
 def get_error_message(error, language):
     """Filters the traceback from stderr and returns only the error message."""
-    if error == "":
+    if error == '':
         return None
     elif language == "python":
         if any(e in error for e in ["KeyboardInterrupt", "SystemExit", "GeneratorExit"]): # Non-compiler errors
             return None
         else:
-            return error.split("\n")[-2][1:]
+            return error.split('\n')[-2][1:]
     elif language == "node":
-        return error.split("\n")[4][1:]
+        return error.split('\n')[4][1:]
     elif language == "ruby":
         return # TODO
     elif language == "java":
@@ -169,7 +170,7 @@ def souper(url):
 
 def search_stackoverflow(query):
     """Wrapper function for get_search_results."""
-    soup = souper(SO_URL + "/search?pagesize=50&q=%s" % query.replace(" ", "+"))
+    soup = souper(SO_URL + "/search?pagesize=50&q=%s" % query.replace(' ', '+'))
 
     # TODO: Randomize the user agent
 
@@ -185,23 +186,26 @@ def get_question_and_answers(url):
 
     soup = souper(url)
 
-    question_title = soup.find_all("a", class_="question-hyperlink")[0].get_text()
-    question_stats = soup.find_all("span", class_="vote-count-post")[0].get_text() # No. of votes
+    if soup == None:
+        return (None, None, None, None)
+    else:
+        question_title = soup.find_all('a', class_="question-hyperlink")[0].get_text()
+        question_stats = soup.find_all("span", class_="vote-count-post")[0].get_text() # No. of votes
 
-    try:
-        # Votes, submission date, view count, date of last activity
-        question_stats = question_stats + " Votes | " + (((soup.find_all("div", class_="module question-stats")[0].get_text()).replace("\n", " ")).replace("     "," | "))
-    except IndexError:
-        question_stats = "Could not load statistics."
+        try:
+            # Votes, submission date, view count
+            question_stats = question_stats + " Votes | " + "|".join((((soup.find_all("div", class_="module question-stats")[0].get_text()).replace("\n", " ")).replace("     "," | ")).split("|")[:2])
+        except IndexError:
+            question_stats = "Could not load statistics."
 
-    question_desc = (soup.find_all("div", class_="post-text")[0]).get_text()
-    question_stats = ' '.join(question_stats.split())
+        question_desc = (soup.find_all("div", class_="post-text")[0]).get_text()
+        question_stats = ' '.join(question_stats.split())
 
-    answers = [answer.get_text() for answer in soup.find_all("div", class_="post-text")][1:]
-    if len(answers) == 0:
-        answers.append(urwid.Text("No answers for this question."))
+        answers = [answer.get_text() for answer in soup.find_all("div", class_="post-text")][1:]
+        if len(answers) == 0:
+            answers.append(urwid.Text("No answers for this question."))
 
-    return question_title, question_desc, question_stats, answers
+        return question_title, question_desc, question_stats, answers
 
 
 ## INTERFACE ##
@@ -226,8 +230,10 @@ class App(object):
     def __init__(self, search_results):
         self.search_results = search_results
         self.palette = [
-            ('menu', 'black', 'light cyan', 'standout'),
-            ('reveal focus', 'black', 'light cyan', 'standout')
+            ("title", "light cyan,underline", "default", "standout"),
+            ("stats", "light green", "default", "standout"),
+            ("menu", "black", "light cyan", "standout"),
+            ("reveal focus", "black", "light cyan", "standout")
             ]
         self.menu = urwid.Text([
             u'\n',
@@ -297,9 +303,9 @@ class App(object):
 
 
     def __stylize_question(self, title, desc, stats):
-        new_title = urwid.AttrMap(urwid.Text(("light cyan", u"%s\n" % title)), "underline")
+        new_title = urwid.Text(("title", u"%s\n" % title))
         new_desc = urwid.Text(u"%s\n" % desc) # TODO: Highlight code blocks
-        new_stats = urwid.Text(("light green", u"%s\n" % stats))
+        new_stats = urwid.Text(("stats", u"%s\n" % stats))
 
         return [new_title, new_desc, new_stats]
 
@@ -313,8 +319,8 @@ class App(object):
 
 def confirm(question):
     """Prompts a given question and handles user input."""
-    valid = {"yes": True, "y": True, "ye": True,
-             "no": False, "n": False, "": True}
+    valid = {"yes": True, 'y': True, "ye": True,
+             "no": False, 'n': False, '': True}
     prompt = " [Y/n] "
 
     while True:
