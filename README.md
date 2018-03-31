@@ -17,7 +17,9 @@ Compiling a file with rebound is as simple as doing it normally. Just run:
 
 `$ rebound [file_name]`
 
-This will execute the file, catch any compiler errors, and prompt you to browse related Stack Overflow questions/answers. Rebound currently supports Python and NodeJS files. Support for Ruby and Java is coming soon!
+This will execute the file, catch any compiler errors, and prompt you to browse related Stack Overflow questions/answers. 
+
+__Supported file types:__ Python, Node.js, Ruby, and Java.
 
 ## Contributing
 
