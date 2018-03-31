@@ -1,4 +1,7 @@
 # Rebound
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/shobrook/BitVision/blob/master/LICENSE)
+[![build](https://img.shields.io/wercker/ci/wercker/docs.svg)]()
+
 Rebound automatically displays Stack Overflow search results in your terminal when you get a compiler error. Just use the `rebound` command before the file you want to execute.
 
 ![Placeholder Demo](img/demo.gif)
