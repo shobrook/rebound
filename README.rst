@@ -5,7 +5,10 @@ Rebound automatically displays Stack Overflow search results in your
 terminal when you get a compiler error. Just use the ``rebound`` command
 before the file you want to execute.
 
-[|placeholder demo|]
+.. figure:: img/demo.gif
+   :alt: Placeholder Demo
+
+   Placeholder Demo
 
 Installation
 ------------
@@ -21,7 +24,7 @@ Usage
 -----
 
 Compiling a file with rebound is as simple as doing it normally. Just
-run (without the brackets):
+run:
 
 ``$ rebound [file_name]``
 
@@ -39,11 +42,12 @@ compiler errors.
 
 To make a contribution, clone the repo and create a new branch, make
 your changes and then submit a pull request. If you’ve discovered a bug
-or have a feature request, create an issue and tag it respectively.
+or have a feature request, create an `issue`_ and tag it respectively.
 
 Acknowledgements
 ----------------
 
-Special thanks to @alichtman for providing helpful feedback.
+Special thanks to [@alichtman](https://github.com/alichtman) for
+providing helpful feedback.
 
-.. |placeholder demo| image:: https://asciinema.org/a/ADAlkK9BkqxQMkYY2wZFC3CCz
+.. _issue: https://github.com/shobrook/rebound/issues/new

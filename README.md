@@ -1,7 +1,7 @@
 # Rebound
 Rebound automatically displays Stack Overflow search results in your terminal when you get a compiler error. Just use the `rebound` command before the file you want to execute.
 
-[![placeholder demo](https://asciinema.org/a/ADAlkK9BkqxQMkYY2wZFC3CCz)]
+![Placeholder Demo](img/demo.gif)
 
 ## Installation
 
@@ -13,7 +13,7 @@ Requires Python 2.0 or higher. OS X, Linux, and Windows are all supported.
 
 ## Usage
 
-Compiling a file with rebound is as simple as doing it normally. Just run (without the brackets):
+Compiling a file with rebound is as simple as doing it normally. Just run:
 
 `$ rebound [file_name]`
 
@@ -23,8 +23,8 @@ This will execute the file, catch any compiler errors, and prompt you to browse 
 
 Rebound is written in Python and built on Urwid. Beautiful Soup is used to scrape Stack Overflow content and subprocess is used to catch compiler errors.
 
-To make a contribution, clone the repo and create a new branch, make your changes and then submit a pull request. If you've discovered a bug or have a feature request, create an issue and tag it respectively.
+To make a contribution, clone the repo and create a new branch, make your changes and then submit a pull request. If you've discovered a bug or have a feature request, create an [issue](https://github.com/shobrook/rebound/issues/new) and tag it respectively.
 
 ## Acknowledgements
 
-Special thanks to @alichtman for providing helpful feedback.
+Special thanks to [@alichtman](https://github.com/alichtman) for providing helpful feedback.
