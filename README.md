@@ -6,8 +6,6 @@ Rebound automatically displays Stack Overflow search results in your terminal wh
 
 ![Placeholder Demo](img/demo.gif)
 
-**Instead of calling `node file.js`, for example, call `rebound file.js` to get the same functionality and better error-handling.**
-
 ## Installation
 
 You can install rebound with pip (homebrew coming soon):
@@ -24,17 +22,13 @@ Compiling a file with rebound is as simple as doing it normally. Just run:
 
 This will execute the file, pull the error message, and allow you to browse related Stack Overflow questions/answers without leaving the terminal.
 
-In other words, instead of calling, say, `$ node file.js`, call `$ rebound file.js` to get the same functionality 
-
 __Supported file types:__ Python, Node.js, Ruby, and Java.
 
 ## Contributing
 
-Rebound is written in Python and built on Urwid. Beautiful Soup is used to scrape Stack Overflow content and subprocess for catching compiler errors.
-
 To make a contribution, fork the repo, make your changes and then submit a pull request. If you've discovered a bug or have a feature request, create an [issue](https://github.com/shobrook/rebound/issues/new) and tag it appropriately :)
 
-I see this project becoming the go-to way to execute programs (replacing ...)
+Rebound is written in Python and built on Urwid. Beautiful Soup is used to scrape Stack Overflow content and subprocess for catching compiler errors.
 
 ## Acknowledgements
 
