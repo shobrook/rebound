@@ -33,8 +33,8 @@ setup(
     packages=["rebound"],
     #data_files=[("rebound", ["rebound/user_agents.txt"])],
     entry_points={"console_scripts": ["rebound = rebound.rebound:main"]},
-    install_requires=["BeautifulSoup4", "requests", "urllib3" "urwid"],
-    requires=["BeautifulSoup4", "requests", "urllib3" "urwid"],
+    install_requires=["BeautifulSoup4", "requests", "urllib3", "urwid"],
+    requires=["BeautifulSoup4", "requests", "urllib3", "urwid"],
     python_requires=">=3", # NOTE: This will change
     license="MIT",
     project_urls={
