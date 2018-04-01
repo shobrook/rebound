@@ -105,7 +105,7 @@ def get_language(file_path):
 
 
 def get_error_message(error, language):
-    """Filters the traceback from stderr and returns only the error message."""
+    """Filters the stack trace from stderr and returns only the error message."""
     if error == '':
         return None
     elif language == "python":
@@ -255,36 +255,34 @@ class App(object):
 
     def __handle_input(self, input):
         if input == "enter": # View answers
-            focus_widget, idx = self.content_container.get_focus()
-            title = focus_widget.base_widget.text
+            url = self.__get_selected_link()
 
-            for result in self.search_results:
-                if title == self.__stylize_title(result):
-                    self.viewing_answers = True
-                    question_title, question_desc, question_stats, answers = get_question_and_answers(result["URL"])
+            if url != None:
+                self.viewing_answers = True
+                question_title, question_desc, question_stats, answers = get_question_and_answers(url)
 
-                    pile = urwid.Pile(self.__stylize_question(question_title, question_desc, question_stats) + [urwid.Divider('-')] + list(map(lambda answer: self.__stylize_answer(answer), answers)))
-                    filler = urwid.Filler(pile, valign="top")
-                    padding = urwid.Padding(filler, left=1, right=1)
-                    linebox = urwid.LineBox(padding)
+                pile = urwid.Pile(self.__stylize_question(question_title, question_desc, question_stats) + [urwid.Divider('-')] + list(map(lambda answer: self.__stylize_answer(answer), answers)))
+                filler = urwid.Filler(pile, valign="top")
+                padding = urwid.Padding(filler, left=1, right=1)
+                linebox = urwid.LineBox(padding)
 
-                    menu = urwid.Text([
-                        u'\n',
-                        ("menu", u" ESC "), ("light gray", u" Go back "),
-                        ("menu", u" B "), ("light gray", u" Open browser "),
-                        ("menu", u" Q "), ("light gray", u" Quit"),
-                    ])
+                menu = urwid.Text([
+                    u'\n',
+                    ("menu", u" ESC "), ("light gray", u" Go back "),
+                    ("menu", u" B "), ("light gray", u" Open browser "),
+                    ("menu", u" Q "), ("light gray", u" Quit"),
+                ])
 
-                    self.main_loop.widget = urwid.Frame(body=urwid.Overlay(linebox, self.content_container, "center", 85, "middle", 23), footer=menu)
-                    break
+                self.main_loop.widget = urwid.Frame(body=urwid.Overlay(linebox, self.content_container, "center", 85, "middle", 23), footer=menu)
+
+            # TODO: Handle url == None
         elif input in ('b', 'B'): # Open link
-            focus_widget, idx = self.content_container.get_focus()
-            title = focus_widget.base_widget.text
+            url = self.__get_selected_link()
 
-            for result in self.search_results:
-                if title == self.__stylize_title(result):
-                    webbrowser.open(result["URL"])
-                    break
+            if url != None:
+                webbrowser.open(url)
+
+            # TODO: Handle url == None
         elif input == "esc": # Close window
             if self.viewing_answers:
                 self.main_loop.widget = self.original_widget
@@ -293,6 +291,18 @@ class App(object):
                 raise urwid.ExitMainLoop()
         elif input in ('q', 'Q'): # Quit
             raise urwid.ExitMainLoop()
+
+
+    def __get_selected_link(self):
+        # TEMP: Not the best way to do this tbh.. what about questions w/ identical titles?
+        focus_widget, idx = self.content_container.get_focus() # Gets selected item
+        title = focus_widget.base_widget.text
+
+        for result in self.search_results:
+            if title == self.__stylize_title(result): # Found selected title's search_result object
+                return result["URL"]
+
+        return None
 
 
     def __stylize_title(self, search_result):
