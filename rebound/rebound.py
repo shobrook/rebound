@@ -1,6 +1,6 @@
 """
 Name: Rebound
-Version: 1.1.1
+Version: 1.1.4
 Author: @shobrook
 Description: Command-line tool that automatically searches Stack Overflow and
 displays results in your terminal when you get a compiler error.
@@ -591,7 +591,7 @@ def interleave(a, b):
 
 class App(object):
     def __init__(self, search_results):
-        self.search_results = search_results
+        self.search_results, self.viewing_answers = search_results, False
         self.palette = [
             ("title", "light cyan,underline", "default", "standout"),
             ("stats", "light green", "default", "standout"),
@@ -711,13 +711,13 @@ def confirm(question):
 
 
 # TODO: Add a --help parameter
-def main(command):
-    language = get_language(command[0].lower()) # Gets the language name
+def main():
+    language = get_language(sys.argv[1].lower()) # Gets the language name
     if language == '': # Unknown language
-        sys.stdout.write("\n%s%s%s" % (RED, "Sorry, Rebound doesn't support this file type.", END))
+        sys.stdout.write("\n%s%s%s" % (RED, "Sorry, Rebound doesn't support this file type.\n", END))
         return
 
-    output, error = execute([language] + command[0:]) # Executes the command and pipes stdout
+    output, error = execute([language] + sys.argv[1:]) # Executes the command and pipes stdout
     error_msg = get_error_message(error, language) # Prepares error message for search
 
     if error_msg != None:
@@ -726,11 +726,17 @@ def main(command):
 
         if search_results != []:
             if captcha:
-                sys.stdout.write("\n%s%s%s" % (RED, "Sorry, Stack Overflow blocked our request. Try again in a minute.", END))
+                sys.stdout.write("\n%s%s%s" % (RED, "Sorry, Stack Overflow blocked our request. Try again in a minute.\n", END))
                 return
             elif confirm("\nDisplay Stack Overflow results?"):
-                return App(search_results)
+                App(search_results)
         else:
-            sys.stdout.write("\n%s%s%s" % (RED, "No Stack Overflow results found.", END))
+            sys.stdout.write("\n%s%s%s" % (RED, "No Stack Overflow results found.\n", END))
     else:
-        sys.stdout.write("\n%s%s%s" % (CYAN, "No error detected :)", END))
+        sys.stdout.write("\n%s%s%s" % (CYAN, "No error detected :)\n", END))
+
+    return
+
+
+if __name__ == "__main__":
+    main()

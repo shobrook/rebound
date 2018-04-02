@@ -12,7 +12,7 @@ with open("README.rst", encoding="utf-8") as file:
 
 setup(
     name="rebound-cli",
-    version="1.1.1a1",
+    version="1.1.4a1",
     description="Automatically displays Stack Overflow results when you get a compiler error",
     long_description=readme,
     url="https://github.com/shobrook/rebound",
