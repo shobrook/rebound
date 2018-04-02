@@ -4,7 +4,7 @@
 
 Rebound automatically displays Stack Overflow search results in your terminal when you get a compiler error. Just use the `rebound` command before the file you want to execute.
 
-![Placeholder Demo](img/demo.gif)
+![Placeholder Demo](demo.gif)
 
 ## Installation
 
@@ -32,4 +32,4 @@ Rebound is written in Python and built on Urwid. Beautiful Soup is used to scrap
 
 ## Acknowledgements
 
-Special thanks to [@alichtman](https://github.com/alichtman) for providing helpful feedback.
+Special thanks to [@rndusr](https://github.com/rndusr) for helping with the scrollbar and [@alichtman](https://github.com/alichtman) for providing useful feedback.
