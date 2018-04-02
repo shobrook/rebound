@@ -727,7 +727,6 @@ def main():
         if search_results != []:
             if captcha:
                 sys.stdout.write("\n%s%s%s" % (RED, "Sorry, Stack Overflow blocked our request. Try again in a minute.\n", END))
-                return
             elif confirm("\nDisplay Stack Overflow results?"):
                 App(search_results)
         else:
