@@ -32,4 +32,4 @@ Rebound is written in Python and built on Urwid. Beautiful Soup is used to scrap
 
 ## Acknowledgements
 
-Special thanks to [@rndusr](https://github.com/rndusr) for helping with the scrollbar and [@alichtman](https://github.com/alichtman) for providing useful feedback.
+Special thanks to [@rndusr](https://github.com/rndusr) for helping with the scrollbar.
