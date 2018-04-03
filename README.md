@@ -13,7 +13,7 @@ Compiling a file with `rebound` is just as easy as running it normally:
 
 `$ rebound [file_name]`
 
-This will execute the file, pull the error message, and allow you to browse related Stack Overflow questions/answers without leaving the terminal. <!--Here's an example:-->
+This will execute the file, pull the error message, and allow you to browse related Stack Overflow questions and answers without leaving the terminal. <!--Here's an example:-->
 
 __Supported file types:__ Python, Node.js, Ruby, and Java.
 
