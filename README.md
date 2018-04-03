@@ -2,54 +2,36 @@
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/shobrook/BitVision/blob/master/LICENSE)
 [![build](https://img.shields.io/wercker/ci/wercker/docs.svg)]()
 
-`rebound` automatically displays Stack Overflow search results in your terminal when you get a compiler error. Just use the `rebound` command before the file you want to execute.
+Rebound automatically displays Stack Overflow search results in your terminal whenever you get a compiler error. Just use the `rebound` command before the file you want to execute.
 
 ![Placeholder Demo](demo.gif)
 
 ## Usage
 
-Compiling a file with `rebound` is as simple as running it normally. Just run:
+Compiling a file with `rebound` is just as easy as running it normally: 
 
 `$ rebound [file_name]`
 
-`rebound` will execute the file, pull the error message, and allow you to browse related Stack Overflow questions and answers without leaving the terminal.
+This will execute the file, pull the error message, and allow you to browse related Stack Overflow questions/answers without leaving the terminal. <!--Here's an example:-->
 
-**Supported file types**
-+ Python
-+ Node.js
-+ Ruby
-+ Java
+__Supported file types:__ Python, Node.js, Ruby, and Java.
 
 ## Installation
 
-You can install `rebound` with `pip` (`homebrew` coming soon):
+You can install rebound with pip:
 
 `$ pip install rebound-cli`
 
-Requires `Python 2.0` or higher. `MacOS`, `Linux`, and `Windows` are all supported.
+Requires Python 2.0 or higher. MacOS, Linux, and Windows are all supported.
 
 ## Dependencies
 
-Rebound is written in `Python`.
-
-+ [Urwid](http://urwid.org/) is used to format the CLI.
-+ [Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/) is used to scrape Stack Overflow content
-+ [Subprocess](https://docs.python.org/3/library/subprocess.html) is used to catch compiler errors.
+Rebound is written in Python and built on Urwid. Beautiful Soup is used to scrape Stack Overflow content and subprocess for catching compiler errors.
 
 ## Contributing
 
-To make a contribution:
-1. Fork the repo.
-2. Make your changes.
-3. Submit a pull request.
-
-If you've discovered a bug or have a feature request:
-1. Create an [issue](https://github.com/shobrook/rebound/issues/new).
-2. Tag it appropriately.
+To make a contribution, fork the repo, make your changes and then submit a pull request. If you've discovered a bug or have a feature request, create an [issue](https://github.com/shobrook/rebound/issues/new) and tag it appropriately :)
 
 ## Acknowledgements
 
-Special thanks to:
-
-1. [@rndusr](https://github.com/rndusr) for helping with the scrollbar.
-2. [@alichtman](https://github.com/alichtman) for helping with interface design decisons.
+Special thanks to [@rndusr](https://github.com/rndusr) for helping with the scrollbar and [@alichtman](https://github.com/alichtman) for helping build the test suite.
