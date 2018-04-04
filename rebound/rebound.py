@@ -162,6 +162,27 @@ def execute(command):
 ## Helper Functions ##
 
 
+def recursiveCodeHighlight(soup):
+    """ """
+    # TODO: Handle blockquotes and markdown
+    stylized_text = []
+    code_blocks = [block.get_text() for block in soup.find_all("code")]
+
+    for child in soup.recursiveChildGenerator():
+        name = getattr(child, "name", None)
+
+        if name is None: # Leaf (terminal) node
+            #if not child.isspace():
+            if child in code_blocks:
+                stylized_text.append(("code", u"%s" % str(child))) # TODO: Add \n for code blocks (not in-line code)
+            else:
+                stylized_text.append(u"%s" % str(child))
+
+    # TODO: If last text element is code, remove \n
+
+    return urwid.Text(stylized_text)
+
+
 def get_search_results(soup):
     """Returns a list of dictionaries containing each search result."""
     search_results = []
@@ -192,7 +213,7 @@ def souper(url):
     html = requests.get(url)
 
     if re.search("\.com/nocaptcha", html.url): # Return None if the URL is a captcha page
-        # TODO: Implement a captcha solver
+        # TODO: Implement a captcha solver (low priority and probably impossible)
         return None
     else:
         return BeautifulSoup(html.text, "html.parser")
@@ -224,19 +245,17 @@ def get_question_and_answers(url):
         question_stats = soup.find_all("span", class_="vote-count-post")[0].get_text() # Vote count
 
         try:
-            question_stats = question_stats + " Votes * " + '*'.join((((soup.find_all("div", class_="module question-stats")[0].get_text())
-                .replace('\n', ' ')).replace("     ", " * ")).split('*')[:2]) # Vote count, submission date, view count
+            question_stats = question_stats + " Votes | " + '|'.join((((soup.find_all("div", class_="module question-stats")[0].get_text())
+                .replace('\n', ' ')).replace("     ", " | ")).split('|')[:2]) # Vote count, submission date, view count
         except IndexError:
             question_stats = "Could not load statistics."
 
-        # TODO: Identify <code> tags so codeblocks can be stylized later
-
-        question_desc = (soup.find_all("div", class_="post-text")[0]).get_text()
+        question_desc = recursiveCodeHighlight(soup.find_all("div", class_="post-text")[0]) # TODO: Handle duplicates
         question_stats = ' '.join(question_stats.split())
 
-        answers = [answer.get_text() for answer in soup.find_all("div", class_="post-text")][1:]
+        answers = [recursiveCodeHighlight(answer) for answer in soup.find_all("div", class_="post-text")][1:]
         if len(answers) == 0:
-            answers.append("No answers for this question.")
+            answers.append(urwid.Text(("no answers", u"\nNo answers for this question.")))
 
         return question_title, question_desc, question_stats, answers
 
@@ -559,11 +578,11 @@ class ScrollBar(urwid.WidgetDecoration):
             handled = ow.mouse_event(ow_size, event, button, col, row, focus)
 
         if not handled and hasattr(ow, "set_scrollpos"):
-            if button == 4: # scroll wheel up
+            if button == 4: # Scroll wheel up
                 pos = ow.get_scrollpos(ow_size)
                 ow.set_scrollpos(pos - 1)
                 return True
-            elif button == 5: # scroll wheel down
+            elif button == 5: # Scroll wheel down
                 pos = ow.get_scrollpos(ow_size)
                 ow.set_scrollpos(pos + 1)
                 return True
@@ -602,11 +621,12 @@ class App(object):
     def __init__(self, search_results):
         self.search_results, self.viewing_answers = search_results, False
         self.palette = [
-            ("title", "light cyan,underline", "default", "standout"),
+            ("title", "light cyan,bold,underline", "default", "standout"),
             ("stats", "light green", "default", "standout"),
             ("menu", "black", "light cyan", "standout"),
             ("reveal focus", "black", "light cyan", "standout"),
-            ("no answers", "light red", "default", "standout")
+            ("no answers", "light red", "default", "standout"),
+            ("code", "brown", "default", "standout")
         ]
         self.menu = urwid.Text([
             u'\n',
@@ -634,8 +654,8 @@ class App(object):
                 self.viewing_answers = True
                 question_title, question_desc, question_stats, answers = get_question_and_answers(url)
 
-                pile = urwid.Pile(self._stylize_question(question_title, question_desc, question_stats) + [urwid.Divider('-')] + [urwid.Divider('-')] +
-                interleave(list(map(lambda answer: self._stylize_answer(answer), answers)), [urwid.Divider('-')] * (len(answers) - 1)))
+                pile = urwid.Pile(self._stylize_question(question_title, question_desc, question_stats) + [urwid.Divider('*')] +
+                interleave(answers, [urwid.Divider('-')] * (len(answers) - 1)))
                 padding = urwid.Padding(ScrollBar(Scrollable(pile)), left=2, right=2)
                 #filler = urwid.Filler(padding, valign="top")
                 linebox = urwid.LineBox(padding)
@@ -680,16 +700,10 @@ class App(object):
 
 
     def _stylize_question(self, title, desc, stats):
-        # TODO: Make this prettier
-        new_title = urwid.Text(("title", u"%s\n" % title))
-        new_desc = urwid.Text(u"%s\n" % desc) # TODO: Highlight code blocks
+        new_title = urwid.Text(("title", u"%s" % title))
         new_stats = urwid.Text(("stats", u"%s\n" % stats))
 
-        return [new_title, new_desc, new_stats]
-
-
-    def _stylize_answer(self, answer):
-        return urwid.Text(answer) # TODO: Highlight code blocks
+        return [new_title, desc, new_stats]
 
 
 #######
