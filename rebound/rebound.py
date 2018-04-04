@@ -162,23 +162,34 @@ def execute(command):
 ## Helper Functions ##
 
 
-def recursiveCodeHighlight(soup):
-    """ """
+def stylize_code(soup):
+    """Identifies and stylizes code in a question or answer."""
     # TODO: Handle blockquotes and markdown
     stylized_text = []
     code_blocks = [block.get_text() for block in soup.find_all("code")]
+    blockquotes = [block.get_text() for block in soup.find_all("blockquote")]
+    newline = False
 
     for child in soup.recursiveChildGenerator():
         name = getattr(child, "name", None)
 
         if name is None: # Leaf (terminal) node
-            #if not child.isspace():
             if child in code_blocks:
-                stylized_text.append(("code", u"%s" % str(child))) # TODO: Add \n for code blocks (not in-line code)
+                if code_blocks.index(child) == len(code_blocks) - 1:
+                    child = child[:-1]
+                if newline:
+                    stylized_text.append(("code", u"\n%s" % str(child)))
+                    newline = False
+                else:
+                    stylized_text.append(("code", u"%s" % str(child)))
             else:
+                newline = child.endswith('\n')
                 stylized_text.append(u"%s" % str(child))
 
-    # TODO: If last text element is code, remove \n
+    if type(stylized_text[-2]) == tuple:
+        # Remove newline from questions/answers that end with a code block
+        if repr(stylized_text[-2][1]) in code_blocks and repr(stylized_text[-2][1]).endswith('\n'):
+            stylized_text[-2] = ("code", stylized_text[-2][1][:-1])
 
     return urwid.Text(stylized_text)
 
@@ -213,7 +224,7 @@ def souper(url):
     html = requests.get(url)
 
     if re.search("\.com/nocaptcha", html.url): # Return None if the URL is a captcha page
-        # TODO: Implement a captcha solver (low priority and probably impossible)
+        # TODO: Implement a captcha solver
         return None
     else:
         return BeautifulSoup(html.text, "html.parser")
@@ -250,10 +261,10 @@ def get_question_and_answers(url):
         except IndexError:
             question_stats = "Could not load statistics."
 
-        question_desc = recursiveCodeHighlight(soup.find_all("div", class_="post-text")[0]) # TODO: Handle duplicates
+        question_desc = stylize_code(soup.find_all("div", class_="post-text")[0]) # TODO: Handle duplicates
         question_stats = ' '.join(question_stats.split())
 
-        answers = [recursiveCodeHighlight(answer) for answer in soup.find_all("div", class_="post-text")][1:]
+        answers = [stylize_code(answer) for answer in soup.find_all("div", class_="post-text")][1:]
         if len(answers) == 0:
             answers.append(urwid.Text(("no answers", u"\nNo answers for this question.")))
 
@@ -621,7 +632,7 @@ class App(object):
     def __init__(self, search_results):
         self.search_results, self.viewing_answers = search_results, False
         self.palette = [
-            ("title", "light cyan,bold,underline", "default", "standout"),
+            ("title", "light cyan,bold", "default", "standout"),
             ("stats", "light green", "default", "standout"),
             ("menu", "black", "light cyan", "standout"),
             ("reveal focus", "black", "light cyan", "standout"),
@@ -694,9 +705,9 @@ class App(object):
 
     def _stylize_title(self, search_result):
         if search_result["Answers"] == 1:
-            return "%s Answer | %s" % (search_result["Answers"], search_result["Title"])
+            return "%s (1 Answer)" % search_result["Title"]
         else:
-            return "%s Answers | %s" % (search_result["Answers"], search_result["Title"])
+            return "%s (%s Answers)" % (search_result["Title"], search_result["Answers"])
 
 
     def _stylize_question(self, title, desc, stats):
