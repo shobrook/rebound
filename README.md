@@ -9,7 +9,7 @@ Rebound automatically displays Stack Overflow search results in your terminal wh
 
 ## Usage
 
-Compiling a file with `rebound` is just as easy as running it normally: 
+Compiling a file with `rebound` is just as easy as running it normally:
 
 `$ rebound [file_name]`
 
@@ -23,7 +23,7 @@ You can install rebound with pip:
 
 `$ pip install rebound-cli`
 
-Requires Python 2.0 or higher. MacOS, Linux, and Windows are all supported.
+Requires Python 3.0 or higher. MacOS, Linux, and Windows are all supported.
 
 ## Contributing
 
