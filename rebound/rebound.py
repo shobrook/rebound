@@ -122,7 +122,7 @@ def execute(command):
         stdout=PIPE,
         stderr=PIPE,
         bufsize=1
-        )
+    )
 
     output, errors = [], []
     pipe_queue = Queue() # Wowee, thanks CS 225
@@ -170,25 +170,26 @@ def stylize_code(soup):
     blockquotes = [block.get_text() for block in soup.find_all("blockquote")]
     newline = False
 
-    for child in soup.recursiveChildGenerator():
+    children = soup.recursiveChildGenerator()
+    for child in children:
         name = getattr(child, "name", None)
 
         if name is None: # Leaf (terminal) node
             if child in code_blocks:
-                if code_blocks.index(child) == len(code_blocks) - 1:
-                    child = child[:-1]
-                if newline:
+                if newline: # Code block
+                    #if code_blocks.index(child) == len(code_blocks) - 1: # Last code block
+                        #child = child[:-1]
                     stylized_text.append(("code", u"\n%s" % str(child)))
                     newline = False
-                else:
+                else: # In-line code
                     stylized_text.append(("code", u"%s" % str(child)))
-            else:
+            else: # Plaintext
                 newline = child.endswith('\n')
                 stylized_text.append(u"%s" % str(child))
 
     if type(stylized_text[-2]) == tuple:
         # Remove newline from questions/answers that end with a code block
-        if repr(stylized_text[-2][1]) in code_blocks and repr(stylized_text[-2][1]).endswith('\n'):
+        if stylized_text[-2][1].endswith('\n'):
             stylized_text[-2] = ("code", stylized_text[-2][1][:-1])
 
     return urwid.Text(stylized_text)
@@ -223,8 +224,7 @@ def souper(url):
     """Turns a given URL into a BeautifulSoup object."""
     html = requests.get(url)
 
-    if re.search("\.com/nocaptcha", html.url): # Return None if the URL is a captcha page
-        # TODO: Implement a captcha solver
+    if re.search("\.com/nocaptcha", html.url): # URL is a captcha page
         return None
     else:
         return BeautifulSoup(html.text, "html.parser")
@@ -389,6 +389,7 @@ class Scrollable(urwid.WidgetDecoration):
         else:
             return False
 
+
     def _adjust_trim_top(self, canv, size):
         """Adjust self._trim_top according to self._scroll_action"""
         action = self._scroll_action
@@ -466,7 +467,7 @@ class Scrollable(urwid.WidgetDecoration):
 
 
 class ScrollBar(urwid.WidgetDecoration):
-    # TODO: Change scrollbar size
+    # TODO: Change scrollbar size and color(?)
 
     def sizing(self):
         return frozenset((BOX,))
