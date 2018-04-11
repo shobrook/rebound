@@ -1,6 +1,4 @@
 # Rebound
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/shobrook/BitVision/blob/master/LICENSE)
-![status](https://img.shields.io/pypi/status/Django.svg)
 
 Rebound automatically displays Stack Overflow search results in your terminal whenever you get a compiler error. Just use the `rebound` command before the file you want to execute.
 
