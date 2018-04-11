@@ -26,7 +26,7 @@ Requires Python 3.0 or higher. MacOS, Linux, and Windows are all supported.
 
 To make a contribution, fork the repo, make your changes and then submit a pull request. If you've discovered a bug or have a feature request, create an [issue](https://github.com/shobrook/rebound/issues/new) and tag it appropriately :)
 
-## Tech Stack
+## Technologies
 
 Rebound is written in Python and built on Urwid. Beautiful Soup is used to scrape Stack Overflow content and subprocess for catching compiler errors.
 
