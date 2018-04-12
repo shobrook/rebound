@@ -1,26 +1,26 @@
-# Rebound
+# rebound
 
-Rebound lets you instantly browse Stack Overflow search results in your terminal whenever you get a compiler error. Just use the `rebound` command before the file you want to execute.
+rebound lets you instantly browse Stack Overflow results in your terminal when you get a compiler error. Just use the `rebound` command before the file you want to execute.
 
 ![Placeholder Demo](demo.gif)
 
-## Usage
-
-Compiling a file with `rebound` is just as easy as running it normally:
-
-`$ rebound [file_name]`
-
-This will execute the file, pull the error message, and allow you to browse related Stack Overflow questions and answers without leaving the terminal. <!--Here's an example:-->
-
-__Supported file types:__ Python, Node.js, Ruby, and Java.
-
 ## Installation
 
-You can install rebound with pip:
+rebound works on MacOS, Linux, and Windows, with binary downloads available for [every release.](https://github.com/shobrook/rebound/releases) You can also install it with pip:
 
 `$ pip install rebound-cli`
 
-Requires Python 3.0 or higher. MacOS, Linux, and Windows are all supported.
+Requires Python 3.0 or higher.
+
+## Usage
+
+Running a file with `rebound` is just as easy as compiling it normally:
+
+`$ rebound [file_path]`
+
+This will execute the file, pull the error message, and let you browse related Stack Overflow questions and answers without leaving the terminal.
+
+__Supported file types:__ Python and Node.js (Ruby and Java coming soon!).
 
 ## Contributing
 
