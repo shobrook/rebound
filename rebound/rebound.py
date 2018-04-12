@@ -170,8 +170,7 @@ def stylize_code(soup):
     blockquotes = [block.get_text() for block in soup.find_all("blockquote")]
     newline = False
 
-    children = soup.recursiveChildGenerator()
-    for child in children:
+    for child in soup.recursiveChildGenerator():
         name = getattr(child, "name", None)
 
         if name is None: # Leaf (terminal) node
@@ -647,7 +646,7 @@ class App(object):
             ("menu", u" Q "), ("light gray", u" Quit"),
         ])
 
-        results = list(map(lambda result: urwid.AttrMap(SelectableText(self._stylize_title(result)), None, "reveal focus"), self.search_results)) # TODO: Truncate each item to one line
+        results = list(map(lambda result: urwid.AttrMap(SelectableText(self._stylize_title(result)), None, "reveal focus"), self.search_results)) # TODO: Add a wrap='clip' attribute
         content = urwid.SimpleListWalker(results)
         self.content_container = urwid.ListBox(content)
         layout = urwid.Frame(body=self.content_container, footer=self.menu)
