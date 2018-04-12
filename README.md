@@ -1,12 +1,12 @@
 # rebound
 
-rebound lets you instantly browse Stack Overflow results in your terminal when you get a compiler error. Just use the `rebound` command before the file you want to execute.
+Rebound lets you instantly browse Stack Overflow results in your terminal when you get a compiler error. Just use the `rebound` command before the file you want to execute.
 
 ![Placeholder Demo](demo.gif)
 
 ## Installation
 
-rebound works on MacOS, Linux, and Windows, with binary downloads available for [every release.](https://github.com/shobrook/rebound/releases) You can also install it with pip:
+Rebound works on MacOS, Linux, and Windows, with binary downloads available for [every release.](https://github.com/shobrook/rebound/releases) You can also install it with pip:
 
 `$ pip install rebound-cli`
 
