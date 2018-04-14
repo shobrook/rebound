@@ -4,6 +4,8 @@ Rebound lets you instantly browse Stack Overflow results in your terminal when y
 
 ![Placeholder Demo](demo.gif)
 
+Featured on: [awesome-cli-apps](https://github.com/agarrharr/awesome-cli-apps) and [awesome-mac](https://github.com/jaywcjlove/awesome-mac).
+
 ## Installation
 
 Rebound works on MacOS, Linux, and Windows, with binary downloads available for [every release.](https://github.com/shobrook/rebound/releases) You can also install it with pip:
