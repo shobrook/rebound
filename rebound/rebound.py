@@ -1,6 +1,6 @@
 """
 Name: Rebound
-Version: 1.1.5
+Version: 1.1.6
 Author: @shobrook
 Description: Command-line tool that automatically searches Stack Overflow and
 displays results in your terminal when you get a compiler error.
