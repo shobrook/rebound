@@ -58,7 +58,7 @@ SCROLLBAR_RIGHT = "right"
 def get_language(file_path):
     """Returns the language a file is written in."""
     if file_path.endswith(".py"):
-        return "python"
+        return "python3"
     elif file_path.endswith(".js"):
         return "node"
     elif file_path.endswith(".rb"):
@@ -73,7 +73,7 @@ def get_error_message(error, language):
     """Filters the stack trace from stderr and returns only the error message."""
     if error == '':
         return None
-    elif language == "python":
+    elif language == "python3":
         if any(e in error for e in ["KeyboardInterrupt", "SystemExit", "GeneratorExit"]): # Non-compiler errors
             return None
         else:
