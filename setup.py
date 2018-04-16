@@ -7,14 +7,15 @@ if sys.version_info[:3] < (2, 0, 0):
     sys.stdout.write("Python 1 is not supported.")
     sys.exit(1)
 
-with open("README.rst", encoding="utf-8") as file:
+with open("README.md", encoding="utf-8") as file:
     readme = file.read()
 
 setup(
     name="rebound-cli",
-    version="1.1.5a1",
+    version="1.1.7a1",
     description="Automatically displays Stack Overflow results when you get a compiler error",
     long_description=readme,
+    long_description_content_type="text/markdown",
     url="https://github.com/shobrook/rebound",
     author="shobrook",
     author_email="shobrookj@gmail.com",

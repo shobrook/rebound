@@ -62,9 +62,9 @@ def get_language(file_path):
     elif file_path.endswith(".js"):
         return "node"
     elif file_path.endswith(".rb"):
-        return "ruby"
+        return '' # Ruby coming soon!
     elif file_path.endswith(".java"):
-        return "javac"
+        return '' # Java coming soon!
     else:
         return '' # Unknown language
 
@@ -745,7 +745,7 @@ def print_help():
     sys.stdout.write("%sRebound, V1.1.5a1 - Made by @shobrook%s\n" % (BOLD, END))
     sys.stdout.write("Command-line tool that automatically searches Stack Overflow and displays results in your terminal when you get a compiler error.")
     sys.stdout.write("\n\n%sUsage:%s $ rebound %s[file_name]%s\n" % (UNDERLINE, END, YELLOW, END))
-    sys.stdout.write("\n$ python %stest.py%s   =>   $ rebound %stest.py%s" % (YELLOW, END, YELLOW, END))
+    sys.stdout.write("\n$ python3 %stest.py%s   =>   $ rebound %stest.py%s" % (YELLOW, END, YELLOW, END))
     sys.stdout.write("\n$ node %stest.js%s     =>   $ rebound %stest.js%s\n\n" % (YELLOW, END, YELLOW, END))
 
 
