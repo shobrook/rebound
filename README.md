@@ -1,7 +1,6 @@
 # rebound
 
-Rebound is a command-line tool that instantly fetches Stack Overflow results when you get a compiler error. 
-Just run the file you want to compile with the `rebound` command.
+Rebound is a command-line tool that instantly fetches Stack Overflow results when you get a compiler error. Just use the `rebound` command to execute your file.
 
 ![Placeholder Demo](demo.gif)
 
