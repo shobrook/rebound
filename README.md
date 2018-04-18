@@ -1,5 +1,7 @@
 # rebound
 
+[![Downloads](http://pepy.tech/badge/rebound-cli)](http://pepy.tech/count/rebound-cli)
+
 Rebound is a command-line tool that instantly fetches Stack Overflow results when you get a compiler error. Just use the `rebound` command to execute your file.
 
 ![Placeholder Demo](demo.gif)
