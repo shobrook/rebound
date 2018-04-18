@@ -666,7 +666,7 @@ class App(object):
                 question_title, question_desc, question_stats, answers = get_question_and_answers(url)
 
                 pile = urwid.Pile(self._stylize_question(question_title, question_desc, question_stats) + [urwid.Divider('*')] +
-                interleave(answers, [urwid.Divider('-')] * (len(answers) - 1)))
+                interleave(answers, [urwid.Divider('-')] * (len(answers) - 1)) )
                 padding = urwid.Padding(ScrollBar(Scrollable(pile)), left=2, right=2)
                 #filler = urwid.Filler(padding, valign="top")
                 linebox = urwid.LineBox(padding)
@@ -678,7 +678,7 @@ class App(object):
                     ("menu", u" Q "), ("light gray", u" Quit"),
                 ])
 
-                self.main_loop.widget = urwid.Frame(body=urwid.Overlay(linebox, self.content_container, "center", 85, "middle", 23), footer=menu)
+                self.main_loop.widget = urwid.Frame(body=urwid.Overlay(linebox, self.content_container, "center", ('relative', 60), "middle", 23), footer=menu)
         elif input in ('b', 'B'): # Open link
             url = self._get_selected_link()
 
