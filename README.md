@@ -24,7 +24,7 @@ Running a file with `rebound` is just as easy as compiling it normally:
 
 This will execute the file, pull the error message, and let you browse related Stack Overflow questions and answers without leaving the terminal.
 
-__Supported file types:__ Python and Node.js (Ruby and Java coming soon!).
+__Supported file types:__ Python, Golang, and Node.js (Ruby and Java coming soon!).
 
 ## Contributing
 
