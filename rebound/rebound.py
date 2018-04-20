@@ -62,7 +62,7 @@ def get_language(file_path):
     elif file_path.endswith(".js"):
         return "node"
     elif file_path.endswith(".go"):
-        return "go"
+        return "go run"
     elif file_path.endswith(".rb"):
         return '' # Ruby coming soon!
     elif file_path.endswith(".java"):
@@ -82,14 +82,13 @@ def get_error_message(error, language):
             return error.split('\n')[-2][1:]
     elif language == "node":
         return error.split('\n')[4][1:]
-    elif language == "go":
-        # go includes the lines and columns when it throws and stderr, so we remove that because it's
-        # not helpful for a stackoverflow search
+    elif language == "go run":
         return error.split('\n')[1].split(": ", 1)[1][1:]
     elif language == "ruby":
         return # TODO
     elif language == "java":
         return # TODO
+
 
 #################
 ## FILE EXECUTION
@@ -767,8 +766,6 @@ def main():
         if language == '': # Unknown language
             sys.stdout.write("\n%s%s%s" % (RED, "Sorry, Rebound doesn't support this file type.\n", END))
             return
-        elif language == "go":
-            language = "go run" # go has a specific compilation and run command, so just switch the invocation to Go when running
 
         output, error = execute([language] + sys.argv[1:]) # Compiles the file and pipes stdout
         if (output, error) == (None, None): # Invalid file
