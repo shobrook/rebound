@@ -23,10 +23,10 @@ from threading import Thread
 import webbrowser
 import time
 from urwid.widget import (BOX, FLOW, FIXED)
-from user_agents import USER_AGENTS
-import random
+from fake_useragent import UserAgent
 
 SO_URL = "https://stackoverflow.com"
+ua = UserAgent()
 
 # ASCII color codes
 GREEN = '\033[92m'
@@ -62,8 +62,6 @@ def get_language(file_path):
         return "python3"
     elif file_path.endswith(".js"):
         return "node"
-    elif file_path.endswith(".go"):
-        return "go run"
     elif file_path.endswith(".rb"):
         return ''  # Ruby coming soon!
     elif file_path.endswith(".java"):
@@ -83,8 +81,6 @@ def get_error_message(error, language):
             return error.split('\n')[-2][1:]
     elif language == "node":
         return error.split('\n')[4][1:]
-    elif language == "go run":
-        return error.split('\n')[1].split(": ", 1)[1][1:]
     elif language == "ruby":
         return  # TODO
     elif language == "java":
@@ -226,7 +222,7 @@ def get_search_results(soup):
 
 def souper(url):
     """Turns a given URL into a BeautifulSoup object."""
-    html = requests.get(url, headers={'user-agent': random.choice(user_agent_list)})
+    html = requests.get(url, headers={'user-agent': ua.random})
 
     if re.search("\.com/nocaptcha", html.url):  # URL is a captcha page
         return None
