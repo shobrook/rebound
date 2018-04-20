@@ -61,6 +61,8 @@ def get_language(file_path):
         return "python3"
     elif file_path.endswith(".js"):
         return "node"
+    elif file_path.endswith(".go"):
+        return "go run"
     elif file_path.endswith(".rb"):
         return '' # Ruby coming soon!
     elif file_path.endswith(".java"):
@@ -80,6 +82,8 @@ def get_error_message(error, language):
             return error.split('\n')[-2][1:]
     elif language == "node":
         return error.split('\n')[4][1:]
+    elif language == "go run":
+        return error.split('\n')[1].split(": ", 1)[1][1:]
     elif language == "ruby":
         return # TODO
     elif language == "java":
