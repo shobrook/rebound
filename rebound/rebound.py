@@ -66,7 +66,9 @@ def get_language(file_path):
     elif file_path.endswith(".rb"):
         return '' # Ruby coming soon!
     elif file_path.endswith(".java"):
-        return '' # Java coming soon!
+        return 'javac' # Compile Java Source File
+    elif file_path.endswith(".class"):
+        return 'java' # Run Java Class File
     else:
         return '' # Unknown language
 
@@ -86,8 +88,21 @@ def get_error_message(error, language):
         return error.split('\n')[1].split(": ", 1)[1][1:]
     elif language == "ruby":
         return # TODO
+    elif language == "javac":
+        m = re.search(r'.*error:(.*)', error.split('\n')[0])
+        return m.group(1) if m else None
     elif language == "java":
-        return # TODO
+        for line in error.split('\n'):
+            # Multiple error formats
+            m = re.search(r'.*(Exception|Error):(.*)', line)
+            if m and m.group(2):
+                return m.group(2)
+
+            m = re.search(r'Exception in thread ".*" (.*)', line)
+            if m and m.group(1):
+                return m.group(1)
+
+        return None
 
 
 #################
@@ -152,7 +167,7 @@ def execute(command):
     output = ' '.join(output)
     errors = ' '.join(errors)
 
-    if not os.path.isfile(command[1]): # File doesn't exist
+    if 'java' != command[0] and not os.path.isfile(command[1]): # File doesn't exist, for java, command[1] is a class name instead of a file
         return (None, None)
     else:
         return (output, errors)
@@ -767,12 +782,16 @@ def main():
             sys.stdout.write("\n%s%s%s" % (RED, "Sorry, Rebound doesn't support this file type.\n", END))
             return
 
-        output, error = execute([language] + sys.argv[1:]) # Compiles the file and pipes stdout
+        file_path = sys.argv[1:]
+        if language == 'java':
+            file_path = [f.replace('.class', '') for f in file_path]
+        output, error = execute([language] + file_path) # Compiles the file and pipes stdout
         if (output, error) == (None, None): # Invalid file
             return
 
         error_msg = get_error_message(error, language) # Prepares error message for search
         if error_msg != None:
+            language = 'java' if language == 'javac' else language # Fix language compiler command
             query = "%s %s" % (language, error_msg)
             search_results, captcha = search_stackoverflow(query)
 
