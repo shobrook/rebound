@@ -64,7 +64,7 @@ def get_language(file_path):
     elif file_path.endswith(".go"):
         return "go run"
     elif file_path.endswith(".rb"):
-        return '' # Ruby coming soon!
+        return 'ruby'
     elif file_path.endswith(".java"):
         return '' # Java coming soon!
     else:
@@ -85,7 +85,10 @@ def get_error_message(error, language):
     elif language == "go run":
         return error.split('\n')[1].split(": ", 1)[1][1:]
     elif language == "ruby":
-        return # TODO
+        error_message = error.split('\n')[0]
+        stack_trace_begin = error_message.rfind(': ') + 2
+
+        return error_message[stack_trace_begin:]
     elif language == "java":
         return # TODO
 
