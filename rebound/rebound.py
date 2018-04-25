@@ -64,7 +64,7 @@ def get_language(file_path):
     elif file_path.endswith(".go"):
         return "go run"
     elif file_path.endswith(".rb"):
-        return 'ruby'
+        return "ruby"
     elif file_path.endswith(".java"):
         return '' # Java coming soon!
     else:
