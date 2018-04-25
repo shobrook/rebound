@@ -24,7 +24,9 @@ Running a file with `rebound` is just as easy as compiling it normally:
 
 This will execute the file, pull the error message, and let you browse related Stack Overflow questions and answers without leaving the terminal.
 
-__Supported file types:__ Python, Golang, Node.js and Ruby (Java coming soon!).
+__Supported file types:__ Python, Golang, Node.js, Ruby and Java.
+
+NOTE: For Java, there are two kinds of files: source file (.java) and bytecode file (.class), if the [file_path] is a source file, it will be compiled, if it's a bytecode file, it will be executed assuming there is a `main` method in it.
 
 ## Contributing
 
