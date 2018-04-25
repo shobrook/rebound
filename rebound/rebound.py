@@ -86,9 +86,7 @@ def get_error_message(error, language):
         return error.split('\n')[1].split(": ", 1)[1][1:]
     elif language == "ruby":
         error_message = error.split('\n')[0]
-        stack_trace_begin = error_message.rfind(': ') + 2
-
-        return error_message[stack_trace_begin:]
+        return error_message[error_message.rfind(": ") + 2:]
     elif language == "java":
         return # TODO
 
