@@ -14,6 +14,10 @@ Rebound works on MacOS, Linux, and Windows, with binary downloads available for 
 
 `$ pip install rebound-cli`
 
+or apt-get if you're using Linux:
+
+`$ sudo apt-get install rebound-cli`
+
 Requires Python 3.0 or higher.
 
 ## Usage
