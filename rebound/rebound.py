@@ -509,6 +509,7 @@ class ScrollBar(urwid.WidgetDecoration):
         self.scrollbar_side = side
         self.scrollbar_width = max(1, width)
         self._original_widget_size = (0, 0)
+        self._dragging = False
 
 
     def render(self, size, focus=False):
@@ -629,6 +630,16 @@ class ScrollBar(urwid.WidgetDecoration):
                 return True
             elif col == self.scrollbar_column:
                 ow.set_scrollpos(int(row*ow.scroll_ratio))
+                if event == "mouse press":
+                    self._dragging = True
+                elif event == "mouse release":
+                    self._dragging = False
+            elif self._dragging:
+                ow.set_scrollpos(int(row*ow.scroll_ratio))
+                if event == "mouse release":
+                    self._dragging = False
+
+
 
         return False
 
