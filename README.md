@@ -37,7 +37,7 @@ To make a contribution, fork the repo, make your changes and then submit a pull 
 __Pending Features:__
 * Improved text formatting (i.e. for duplicate questions, markdown, blockquotes, clickable links, etc.)
 * Improved search result accuracy by extracting potential search terms from the stack trace
-* Adding support for more languages
+* Support for more languages
 
 ## Technologies
 
