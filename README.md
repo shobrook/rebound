@@ -35,7 +35,9 @@ __Supported file types:__ Python, Node.js, Ruby, Golang, and Java.
 To make a contribution, fork the repo, make your changes and then submit a pull request. If you've discovered a bug or have a feature request, create an [issue](https://github.com/shobrook/rebound/issues/new) and tag it appropriately :)
 
 __Pending Features:__
-* 
+* Improved text formatting (i.e. for duplicate questions, markdown, blockquotes, clickable links, etc.)
+* Improved search result accuracy by extracting potential search terms from the stack trace
+* Adding support for more languages
 
 ## Technologies
 
