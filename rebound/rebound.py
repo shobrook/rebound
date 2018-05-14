@@ -24,6 +24,9 @@ from threading import Thread
 import webbrowser
 import time
 from urwid.widget import (BOX, FLOW, FIXED)
+import random
+from . import user_agents
+
 
 SO_URL = "https://stackoverflow.com"
 
@@ -241,7 +244,7 @@ def get_search_results(soup):
 
 def souper(url):
     """Turns a given URL into a BeautifulSoup object."""
-    html = requests.get(url)
+    html = requests.get(url, headers={'User-Agent': random.choice(user_agents.USER_AGENTS)})
 
     if re.search("\.com/nocaptcha", html.url): # URL is a captcha page
         return None
