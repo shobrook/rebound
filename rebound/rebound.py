@@ -611,8 +611,9 @@ class ScrollBar(urwid.WidgetDecoration):
         if not handled and hasattr(ow, "set_scrollpos"):
             if button == 4: # Scroll wheel up
                 pos = ow.get_scrollpos(ow_size)
-                ow.set_scrollpos(pos - 1)
-                return True
+                if pos > 0:
+                    ow.set_scrollpos(pos - 1)
+                    return True
             elif button == 5: # Scroll wheel down
                 pos = ow.get_scrollpos(ow_size)
                 ow.set_scrollpos(pos + 1)
