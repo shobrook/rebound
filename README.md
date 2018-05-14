@@ -6,7 +6,7 @@ Rebound is a command-line tool that instantly fetches Stack Overflow results whe
 
 ![Placeholder Demo](demo.gif)
 
-Featured on: [awesome-cli-apps](https://github.com/agarrharr/awesome-cli-apps), [awesome-shell](https://github.com/alebcay/awesome-shell), [awesome-mac](https://github.com/jaywcjlove/awesome-mac), and the top of [/r/Python](https://www.reddit.com/r/Python/comments/8cwq72/i_made_a_commandline_tool_that_instantly_fetches/).
+Featured on: [50 Most Popular Python Projects in 2018](https://boostlog.io/@bily809/50-most-popular-python-projects-in-2018-5aea8e1c47018500491f4361), the top of [r/Python](https://www.reddit.com/r/Python/comments/8cwq72/i_made_a_commandline_tool_that_instantly_fetches/), [awesome-cli-apps](https://github.com/agarrharr/awesome-cli-apps), [awesome-shell](https://github.com/alebcay/awesome-shell), [terminals-are-sexy](https://github.com/k4m4/terminals-are-sexy), and [awesome-mac](https://github.com/jaywcjlove/awesome-mac).
 
 ## Installation
 
