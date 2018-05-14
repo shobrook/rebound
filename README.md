@@ -10,7 +10,7 @@ Featured on: [awesome-cli-apps](https://github.com/agarrharr/awesome-cli-apps), 
 
 ## Installation
 
-Rebound works on MacOS, Linux, and Windows, with binary downloads available for [every release.](https://github.com/shobrook/rebound/releases) You can also install it with pip:
+Rebound works on MacOS, Linux, and Windows (if you use Cygwin), with binary downloads available for [every release.](https://github.com/shobrook/rebound/releases) You can also install it with pip:
 
 `$ pip install rebound-cli`
 
@@ -33,6 +33,9 @@ __Supported file types:__ Python, Node.js, Ruby, Golang, and Java.
 ## Contributing
 
 To make a contribution, fork the repo, make your changes and then submit a pull request. If you've discovered a bug or have a feature request, create an [issue](https://github.com/shobrook/rebound/issues/new) and tag it appropriately :)
+
+__Pending Features:__
+* 
 
 ## Technologies
 
