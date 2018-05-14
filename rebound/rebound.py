@@ -747,16 +747,14 @@ def print_help():
     sys.stdout.write("\n\n%sUsage:%s $ rebound %s[file_name]%s\n" % (UNDERLINE, END, YELLOW, END))
     sys.stdout.write("\n$ python3 %stest.py%s   =>   $ rebound %stest.py%s" % (YELLOW, END, YELLOW, END))
     sys.stdout.write("\n$ node %stest.js%s     =>   $ rebound %stest.js%s\n" % (YELLOW, END, YELLOW, END))
-    sys.stdout.write("\nExtra: -q keywords, eg. $ rebound -q python rebound\n\n")
+    sys.stdout.write("\nIf you just want to query Stack Overflow, use the -q parameter: $ rebound -q %sWhat is an array comprehension?%s\n\n" % (YELLOW, END))
 
 
 ## Main ##
 
 
 def main():
-    if len(sys.argv) == 1:
-        print_help()
-    elif sys.argv[1].lower() == "-h" or sys.argv[1].lower() == "--help":
+    if len(sys.argv) == 1 or sys.argv[1].lower() == "-h" or sys.argv[1].lower() == "--help":
         print_help()
     elif sys.argv[1].lower() == "-q" or sys.argv[1].lower() == "--query":
         query = ' '.join(sys.argv[2:])
