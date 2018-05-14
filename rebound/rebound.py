@@ -699,7 +699,7 @@ class App(object):
                     ("menu", u" Q "), ("light gray", u" Quit"),
                 ])
 
-                self.main_loop.widget = urwid.Frame(body=urwid.Overlay(linebox, self.content_container, "center", 85, "middle", 23), footer=menu)
+                self.main_loop.widget = urwid.Frame(body=urwid.Overlay(linebox, self.content_container, "center", ("relative", 60), "middle", 23), footer=menu)
         elif input in ('b', 'B'): # Open link
             url = self._get_selected_link()
 
@@ -767,17 +767,27 @@ def print_help():
     sys.stdout.write("Command-line tool that automatically searches Stack Overflow and displays results in your terminal when you get a compiler error.")
     sys.stdout.write("\n\n%sUsage:%s $ rebound %s[file_name]%s\n" % (UNDERLINE, END, YELLOW, END))
     sys.stdout.write("\n$ python3 %stest.py%s   =>   $ rebound %stest.py%s" % (YELLOW, END, YELLOW, END))
-    sys.stdout.write("\n$ node %stest.js%s     =>   $ rebound %stest.js%s\n\n" % (YELLOW, END, YELLOW, END))
+    sys.stdout.write("\n$ node %stest.js%s     =>   $ rebound %stest.js%s\n" % (YELLOW, END, YELLOW, END))
+    sys.stdout.write("\nIf you just want to query Stack Overflow, use the -q parameter: $ rebound -q %sWhat is an array comprehension?%s\n\n" % (YELLOW, END))
 
 
 ## Main ##
 
 
 def main():
-    if len(sys.argv) == 1:
+    if len(sys.argv) == 1 or sys.argv[1].lower() == "-h" or sys.argv[1].lower() == "--help":
         print_help()
-    elif sys.argv[1].lower() == "-h" or sys.argv[1].lower() == "--help":
-        print_help()
+    elif sys.argv[1].lower() == "-q" or sys.argv[1].lower() == "--query":
+        query = ' '.join(sys.argv[2:])
+        search_results, captcha = search_stackoverflow(query)
+        if search_results != []:
+            if captcha:
+                sys.stdout.write("\n%s%s%s" % (RED, "Sorry, Stack Overflow blocked our request. Try again in a minute.\n", END))
+                return
+            else:
+                App(search_results) # Opens interface
+        else:
+            sys.stdout.write("\n%s%s%s" % (RED, "No Stack Overflow results found.\n", END))    
     else:
         language = get_language(sys.argv[1].lower()) # Gets the language name
         if language == '': # Unknown language
