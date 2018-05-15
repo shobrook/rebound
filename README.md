@@ -32,7 +32,7 @@ __Supported file types:__ Python, Node.js, Ruby, Golang, and Java.
 
 ## Contributing
 
-To make a contribution, fork the repo, make your changes and then submit a pull request. Please try to adhere to the existing style. If you've discovered a bug or have a feature request, create an [issue](https://github.com/shobrook/rebound/issues/new) and tag it appropriately :)
+To make a contribution, fork the repo, make your changes and then submit a pull request. Please try to adhere to the existing style. If you've discovered a bug or have a feature request, create an [issue](https://github.com/shobrook/rebound/issues/new) and I'll take care of it!
 
 __Pending Features:__
 * Improved text formatting (i.e. for duplicate questions, markdown, blockquotes, clickable links, etc.)
