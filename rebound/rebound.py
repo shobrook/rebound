@@ -276,7 +276,13 @@ def get_search_results(soup):
 
 def souper(url):
     """Turns a given URL into a BeautifulSoup object."""
-    html = requests.get(url, headers={"User-Agent": random.choice(USER_AGENTS)})
+
+    try:
+        html = requests.get(url, headers={"User-Agent": random.choice(USER_AGENTS)})
+    except requests.exceptions.RequestException:
+        sys.stdout.write("\n%s%s%s" % (RED, "Rebound was unable to fetch Stack Overflow results. "
+                                            "Please check that you are connected to the internet.\n", END))
+        sys.exit(1)
 
     if re.search("\.com/nocaptcha", html.url): # URL is a captcha page
         return None
