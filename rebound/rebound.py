@@ -1,6 +1,5 @@
 """
 Name: Rebound
-Version: 1.1.6
 Author: @shobrook
 Description: Command-line tool that automatically searches Stack Overflow and
 displays results in your terminal when you get a compiler error.
@@ -203,7 +202,7 @@ def execute(command):
     output = ' '.join(output)
     errors = ' '.join(errors)
 
-    if 'java' != command[0] and not os.path.isfile(command[1]): # File doesn't exist, for java, command[1] is a class name instead of a file
+    if "java" != command[0] and not os.path.isfile(command[1]): # File doesn't exist, for java, command[1] is a class name instead of a file
         return (None, None)
     else:
         return (output, errors)
@@ -798,7 +797,7 @@ def confirm(question):
 
 def print_help():
     """Prints usage instructions."""
-    sys.stdout.write("%sRebound, V1.1.5a1 - Made by @shobrook%s\n" % (BOLD, END))
+    sys.stdout.write("%sRebound, V1.1.9a1 - Made by @shobrook%s\n" % (BOLD, END))
     sys.stdout.write("Command-line tool that automatically searches Stack Overflow and displays results in your terminal when you get a compiler error.")
     sys.stdout.write("\n\n%sUsage:%s $ rebound %s[file_name]%s\n" % (UNDERLINE, END, YELLOW, END))
     sys.stdout.write("\n$ python3 %stest.py%s   =>   $ rebound %stest.py%s" % (YELLOW, END, YELLOW, END))
@@ -815,6 +814,7 @@ def main():
     elif sys.argv[1].lower() == "-q" or sys.argv[1].lower() == "--query":
         query = ' '.join(sys.argv[2:])
         search_results, captcha = search_stackoverflow(query)
+
         if search_results != []:
             if captcha:
                 sys.stdout.write("\n%s%s%s" % (RED, "Sorry, Stack Overflow blocked our request. Try again in a minute.\n", END))
@@ -822,7 +822,7 @@ def main():
             else:
                 App(search_results) # Opens interface
         else:
-            sys.stdout.write("\n%s%s%s" % (RED, "No Stack Overflow results found.\n", END))    
+            sys.stdout.write("\n%s%s%s" % (RED, "No Stack Overflow results found.\n", END))
     else:
         language = get_language(sys.argv[1].lower()) # Gets the language name
         if language == '': # Unknown language
