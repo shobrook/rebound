@@ -115,7 +115,7 @@ def get_error_message(error, language):
         if any(e in error for e in ["KeyboardInterrupt", "SystemExit", "GeneratorExit"]): # Non-compiler errors
             return None
         else:
-            return error.split('\n')[-2][1:]
+            return error.split('\n')[-2].strip()
     elif language == "node":
         return error.split('\n')[4][1:]
     elif language == "go run":
