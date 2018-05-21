@@ -30,7 +30,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python"
     ],
-    keywords="stackoverflow stack overflow debug debugging error-handling compile errors error message cli",
+    keywords="stackoverflow stack overflow debug debugging error-handling compile errors error message cli search commandline",
     include_package_data=True,
     packages=["rebound"],
     entry_points={"console_scripts": ["rebound = rebound.rebound:main"]},
