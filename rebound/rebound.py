@@ -1,11 +1,3 @@
-"""
-Name: Rebound
-Author: @shobrook
-Description: Command-line tool that automatically searches Stack Overflow and
-displays results in your terminal when you get a compiler error.
-"""
-
-
 ##########
 ## GLOBALS
 ##########
