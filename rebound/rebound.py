@@ -348,6 +348,7 @@ class Scrollable(urwid.WidgetDecoration):
         self._forward_keypress = None
         self._old_cursor_coords = None
         self._rows_max_cached = 0
+        self._rows_max_displayable = 0
         self.__super.__init__(widget)
 
 
@@ -369,7 +370,7 @@ class Scrollable(urwid.WidgetDecoration):
             fill_height = maxrow - canv_rows
             if fill_height > 0: # Canvas is lower than available vertical space
                 canv.pad_trim_top_bottom(0, fill_height)
-
+        self._rows_max_displayable = maxrow
         if canv_cols <= maxcol and canv_rows <= maxrow: # Canvas is small enough to fit without trimming
             return canv
 
@@ -516,6 +517,9 @@ class Scrollable(urwid.WidgetDecoration):
                 raise RuntimeError("Not a flow/box widget: %r" % self._original_widget)
         return self._rows_max_cached
 
+    @property
+    def scroll_ratio(self):
+        return self._rows_max_cached / self._rows_max_displayable
 
 class ScrollBar(urwid.WidgetDecoration):
     # TODO: Change scrollbar size and color(?)
@@ -537,6 +541,7 @@ class ScrollBar(urwid.WidgetDecoration):
         self.scrollbar_side = side
         self.scrollbar_width = max(1, width)
         self._original_widget_size = (0, 0)
+        self._dragging = False
 
 
     def render(self, size, focus=False):
@@ -628,6 +633,12 @@ class ScrollBar(urwid.WidgetDecoration):
             if is_scrolling_widget(w):
                 return w
 
+    @property
+    def scrollbar_column(self):
+        if self.scrollbar_side == SCROLLBAR_LEFT:
+            return 0
+        if self.scrollbar_side == SCROLLBAR_RIGHT:
+            return self._original_widget_size[0]
 
     def keypress(self, size, key):
         return self._original_widget.keypress(self._original_widget_size, key)
@@ -650,6 +661,18 @@ class ScrollBar(urwid.WidgetDecoration):
                 pos = ow.get_scrollpos(ow_size)
                 ow.set_scrollpos(pos + 1)
                 return True
+            elif col == self.scrollbar_column:
+                ow.set_scrollpos(int(row*ow.scroll_ratio))
+                if event == "mouse press":
+                    self._dragging = True
+                elif event == "mouse release":
+                    self._dragging = False
+            elif self._dragging:
+                ow.set_scrollpos(int(row*ow.scroll_ratio))
+                if event == "mouse release":
+                    self._dragging = False
+
+
 
         return False
 
@@ -720,7 +743,7 @@ class App(object):
 
                 pile = urwid.Pile(self._stylize_question(question_title, question_desc, question_stats) + [urwid.Divider('*')] +
                 interleave(answers, [urwid.Divider('-')] * (len(answers) - 1)))
-                padding = urwid.Padding(ScrollBar(Scrollable(pile)), left=2, right=2)
+                padding = ScrollBar(Scrollable(urwid.Padding(pile, left=2, right=2)))
                 #filler = urwid.Filler(padding, valign="top")
                 linebox = urwid.LineBox(padding)
 
