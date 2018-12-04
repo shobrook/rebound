@@ -1,11 +1,3 @@
-"""
-Name: Rebound
-Author: @shobrook
-Description: Command-line tool that automatically searches Stack Overflow and
-displays results in your terminal when you get a compiler error.
-"""
-
-
 ##########
 ## GLOBALS
 ##########
@@ -159,7 +151,7 @@ def read(pipe, funcs):
 def write(get):
     """Pulls output from shared queue and prints to terminal."""
     for line in iter(get, None):
-        sys.stdout.write(line)
+        print(line)
 
 
 ## Main ##
@@ -787,22 +779,22 @@ def confirm(question):
     prompt = " [Y/n] "
 
     while True:
-        sys.stdout.write(BOLD + CYAN + question + prompt + END)
+        print(BOLD + CYAN + question + prompt + END)
         choice = input().lower()
         if choice in valid:
             return valid[choice]
 
-        sys.stdout.write("Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
+        print("Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
 
 
 def print_help():
     """Prints usage instructions."""
-    sys.stdout.write("%sRebound, V1.1.9a1 - Made by @shobrook%s\n" % (BOLD, END))
-    sys.stdout.write("Command-line tool that automatically searches Stack Overflow and displays results in your terminal when you get a compiler error.")
-    sys.stdout.write("\n\n%sUsage:%s $ rebound %s[file_name]%s\n" % (UNDERLINE, END, YELLOW, END))
-    sys.stdout.write("\n$ python3 %stest.py%s   =>   $ rebound %stest.py%s" % (YELLOW, END, YELLOW, END))
-    sys.stdout.write("\n$ node %stest.js%s     =>   $ rebound %stest.js%s\n" % (YELLOW, END, YELLOW, END))
-    sys.stdout.write("\nIf you just want to query Stack Overflow, use the -q parameter: $ rebound -q %sWhat is an array comprehension?%s\n\n" % (YELLOW, END))
+    print("%sRebound, V1.1.9a1 - Made by @shobrook%s\n" % (BOLD, END))
+    print("Command-line tool that automatically searches Stack Overflow and displays results in your terminal when you get a compiler error.")
+    print("\n\n%sUsage:%s $ rebound %s[file_name]%s\n" % (UNDERLINE, END, YELLOW, END))
+    print("\n$ python3 %stest.py%s   =>   $ rebound %stest.py%s" % (YELLOW, END, YELLOW, END))
+    print("\n$ node %stest.js%s     =>   $ rebound %stest.js%s\n" % (YELLOW, END, YELLOW, END))
+    print("\nIf you just want to query Stack Overflow, use the -q parameter: $ rebound -q %sWhat is an array comprehension?%s\n\n" % (YELLOW, END))
 
 
 ## Main ##
@@ -817,16 +809,16 @@ def main():
 
         if search_results != []:
             if captcha:
-                sys.stdout.write("\n%s%s%s" % (RED, "Sorry, Stack Overflow blocked our request. Try again in a minute.\n", END))
+                print("\n%s%s%s" % (RED, "Sorry, Stack Overflow blocked our request. Try again in a minute.\n", END))
                 return
             else:
                 App(search_results) # Opens interface
         else:
-            sys.stdout.write("\n%s%s%s" % (RED, "No Stack Overflow results found.\n", END))
+            print("\n%s%s%s" % (RED, "No Stack Overflow results found.\n", END))
     else:
         language = get_language(sys.argv[1].lower()) # Gets the language name
         if language == '': # Unknown language
-            sys.stdout.write("\n%s%s%s" % (RED, "Sorry, Rebound doesn't support this file type.\n", END))
+            print("\n%s%s%s" % (RED, "Sorry, Rebound doesn't support this file type.\n", END))
             return
 
         file_path = sys.argv[1:]
@@ -844,17 +836,13 @@ def main():
 
             if search_results != []:
                 if captcha:
-                    sys.stdout.write("\n%s%s%s" % (RED, "Sorry, Stack Overflow blocked our request. Try again in a minute.\n", END))
+                    print("\n%s%s%s" % (RED, "Sorry, Stack Overflow blocked our request. Try again in a minute.\n", END))
                     return
                 elif confirm("\nDisplay Stack Overflow results?"):
                     App(search_results) # Opens interface
             else:
-                sys.stdout.write("\n%s%s%s" % (RED, "No Stack Overflow results found.\n", END))
+                print("\n%s%s%s" % (RED, "No Stack Overflow results found.\n", END))
         else:
-            sys.stdout.write("\n%s%s%s" % (CYAN, "No error detected :)\n", END))
+            print("\n%s%s%s" % (CYAN, "No error detected :)\n", END))
 
     return
-
-
-if __name__ == "__main__":
-    main()
