@@ -107,7 +107,7 @@ def get_error_message(error, language):
         if any(e in error for e in ["KeyboardInterrupt", "SystemExit", "GeneratorExit"]): # Non-compiler errors
             return None
         else:
-            return error.split('\n')[-2][1:]
+            return error.split('\n')[-2].strip()
     elif language == "node":
         return error.split('\n')[4][1:]
     elif language == "go run":
@@ -245,7 +245,7 @@ def get_search_results(soup):
     search_results = []
 
     for result in soup.find_all("div", class_="question-summary search-result"):
-        title_container = result.find_all("div", class_="result-link")[0].find_all("span")[0].find_all("a")[0]
+        title_container = result.find_all("div", class_="result-link")[0].find_all("a")[0]
 
         if result.find_all("div", class_="status answered") != []: # Has answers
             answer_count = int(result.find_all("div", class_="status answered")[0].find_all("strong")[0].text)
@@ -267,7 +267,13 @@ def get_search_results(soup):
 
 def souper(url):
     """Turns a given URL into a BeautifulSoup object."""
-    html = requests.get(url, headers={"User-Agent": random.choice(USER_AGENTS)})
+
+    try:
+        html = requests.get(url, headers={"User-Agent": random.choice(USER_AGENTS)})
+    except requests.exceptions.RequestException:
+        sys.stdout.write("\n%s%s%s" % (RED, "Rebound was unable to fetch Stack Overflow results. "
+                                            "Please check that you are connected to the internet.\n", END))
+        sys.exit(1)
 
     if re.search("\.com/nocaptcha", html.url): # URL is a captcha page
         return None
@@ -342,6 +348,7 @@ class Scrollable(urwid.WidgetDecoration):
         self._forward_keypress = None
         self._old_cursor_coords = None
         self._rows_max_cached = 0
+        self._rows_max_displayable = 0
         self.__super.__init__(widget)
 
 
@@ -363,7 +370,7 @@ class Scrollable(urwid.WidgetDecoration):
             fill_height = maxrow - canv_rows
             if fill_height > 0: # Canvas is lower than available vertical space
                 canv.pad_trim_top_bottom(0, fill_height)
-
+        self._rows_max_displayable = maxrow
         if canv_cols <= maxcol and canv_rows <= maxrow: # Canvas is small enough to fit without trimming
             return canv
 
@@ -510,6 +517,9 @@ class Scrollable(urwid.WidgetDecoration):
                 raise RuntimeError("Not a flow/box widget: %r" % self._original_widget)
         return self._rows_max_cached
 
+    @property
+    def scroll_ratio(self):
+        return self._rows_max_cached / self._rows_max_displayable
 
 class ScrollBar(urwid.WidgetDecoration):
     # TODO: Change scrollbar size and color(?)
@@ -531,6 +541,7 @@ class ScrollBar(urwid.WidgetDecoration):
         self.scrollbar_side = side
         self.scrollbar_width = max(1, width)
         self._original_widget_size = (0, 0)
+        self._dragging = False
 
 
     def render(self, size, focus=False):
@@ -622,6 +633,12 @@ class ScrollBar(urwid.WidgetDecoration):
             if is_scrolling_widget(w):
                 return w
 
+    @property
+    def scrollbar_column(self):
+        if self.scrollbar_side == SCROLLBAR_LEFT:
+            return 0
+        if self.scrollbar_side == SCROLLBAR_RIGHT:
+            return self._original_widget_size[0]
 
     def keypress(self, size, key):
         return self._original_widget.keypress(self._original_widget_size, key)
@@ -644,6 +661,18 @@ class ScrollBar(urwid.WidgetDecoration):
                 pos = ow.get_scrollpos(ow_size)
                 ow.set_scrollpos(pos + 1)
                 return True
+            elif col == self.scrollbar_column:
+                ow.set_scrollpos(int(row*ow.scroll_ratio))
+                if event == "mouse press":
+                    self._dragging = True
+                elif event == "mouse release":
+                    self._dragging = False
+            elif self._dragging:
+                ow.set_scrollpos(int(row*ow.scroll_ratio))
+                if event == "mouse release":
+                    self._dragging = False
+
+
 
         return False
 
@@ -714,7 +743,7 @@ class App(object):
 
                 pile = urwid.Pile(self._stylize_question(question_title, question_desc, question_stats) + [urwid.Divider('*')] +
                 interleave(answers, [urwid.Divider('-')] * (len(answers) - 1)))
-                padding = urwid.Padding(ScrollBar(Scrollable(pile)), left=2, right=2)
+                padding = ScrollBar(Scrollable(urwid.Padding(pile, left=2, right=2)))
                 #filler = urwid.Filler(padding, valign="top")
                 linebox = urwid.LineBox(padding)
 

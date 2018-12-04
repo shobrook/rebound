@@ -1,7 +1,5 @@
 # rebound
 
-[![Downloads](http://pepy.tech/badge/rebound-cli)](http://pepy.tech/count/rebound-cli)
-
 Rebound is a command-line tool that instantly fetches Stack Overflow results when you get a compiler error. Just use the `rebound` command to execute your file.
 
 ![Placeholder Demo](docs/demo.gif)
@@ -10,6 +8,8 @@ __Featured in:__ [50 Most Popular Python Projects in 2018](https://boostlog.io/@
 
 ## Installation
 
+>Requires Python 3.0 or higher.
+
 Rebound works on MacOS, Linux, and Windows (if you use Cygwin), with binary downloads available for [every release.](https://github.com/shobrook/rebound/releases) You can also install it with pip:
 
 `$ pip install rebound-cli`
@@ -17,8 +17,6 @@ Rebound works on MacOS, Linux, and Windows (if you use Cygwin), with binary down
 or apt-get if you're using Linux:
 
 `$ sudo apt-get install rebound-cli`
-
-Requires Python 3.0 or higher.
 
 ## Usage
 
