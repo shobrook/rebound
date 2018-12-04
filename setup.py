@@ -6,7 +6,7 @@ from codecs import open
 import sys
 
 if sys.version_info[:3] < (3, 0, 0):
-    sys.stdout.write("Requires Python 3 to run.")
+    print("Requires Python 3 to run.")
     sys.exit(1)
 
 with open("README.md", encoding="utf-8") as file:
@@ -14,8 +14,8 @@ with open("README.md", encoding="utf-8") as file:
 
 setup(
     name="rebound-cli",
-    version="1.1.9a1",
-    description="Command-line tool that instantly fetches Stack Overflow results when you get a compiler error",
+    version="2.0.0",
+    description="Command-line tool that automatically fetches Stack Overflow results after compiler errors",
     #long_description=readme,
     #long_description_content_type="text/markdown",
     url="https://github.com/shobrook/rebound",
