@@ -245,7 +245,7 @@ def get_search_results(soup):
     search_results = []
 
     for result in soup.find_all("div", class_="question-summary search-result"):
-        title_container = result.find_all("div", class_="result-link")[0].find_all("span")[0].find_all("a")[0]
+        title_container = result.find_all("div", class_="result-link")[0].find_all("a")[0]
 
         if result.find_all("div", class_="status answered") != []: # Has answers
             answer_count = int(result.find_all("div", class_="status answered")[0].find_all("strong")[0].text)
