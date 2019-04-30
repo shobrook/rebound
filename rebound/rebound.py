@@ -304,9 +304,9 @@ def get_question_and_answers(url):
         return "Sorry, Stack Overflow blocked our request. Try again in a couple seconds.", "", "", ""
     else:
         question_title = soup.find_all('a', class_="question-hyperlink")[0].get_text()
-        question_stats = soup.find("div", class_="js-vote-count").get_text() # Vote count
 
         try:
+            question_stats = soup.find("div", class_="js-vote-count").get_text()  # Vote count
             question_stats = question_stats + " Votes | " + '|'.join((((soup.find_all("div", class_="module question-stats")[0].get_text())
                 .replace('\n', ' ')).replace("     ", " | ")).split('|')[:2]) # Vote count, submission date, view count
         except IndexError:
