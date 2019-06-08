@@ -254,10 +254,11 @@ def get_search_results(soup):
         elif result.find_all("div", class_="status unanswered") != []: # Has unaccepted anmswer
             answer_count = int(result.find_all("div", class_="status unanswered")[0].find_all("strong")[0].text)
         else: # Answer not displayed in search page
-            try:
-                ans_page=souper(SO_URL + title_container["href"])  # Visit the answer page and get the count directly
-                answer_count =int(ans_page.find("span", {"itemprop":"answerCount"}).text)
-            except:
+            ans_page=souper(SO_URL + title_container["href"])  # Visit the answer page and get the count directly
+            answer_count =ans_page.find("span", {"itemprop":"answerCount"})
+            if answer_count!=None:
+                answer_count=int(answer_count.text)
+            else:
                 answer_count=0 # No Answers
 
         search_results.append({
