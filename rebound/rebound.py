@@ -251,8 +251,14 @@ def get_search_results(soup):
             answer_count = int(result.find_all("div", class_="status answered")[0].find_all("strong")[0].text)
         elif result.find_all("div", class_="status answered-accepted") != []: # Has an accepted answer (closed)
             answer_count = int(result.find_all("div", class_="status answered-accepted")[0].find_all("strong")[0].text)
-        else: # No answers
-            answer_count = 0
+        elif result.find_all("div", class_="status unanswered") != []: # Has unaccepted anmswer
+            answer_count = int(result.find_all("div", class_="status unanswered")[0].find_all("strong")[0].text)
+        else: # Answer not displayed in search page
+            try:
+                ans_page=souper(SO_URL + title_container["href"])  # Visit the answer page and get the count directly
+                answer_count =int(ans_page.find("span", {"itemprop":"answerCount"}).text)
+            except:
+                answer_count=0 # No Answers
 
         search_results.append({
             "Title": title_container["title"],
@@ -305,7 +311,6 @@ def get_question_and_answers(url):
     else:
         question_title = soup.find_all('a', class_="question-hyperlink")[0].get_text()
         question_stats = soup.find("div", class_="js-vote-count").get_text() # Vote count
-
         try:
             question_stats = question_stats + " Votes | " + '|'.join((((soup.find_all("div", class_="module question-stats")[0].get_text())
                 .replace('\n', ' ')).replace("     ", " | ")).split('|')[:2]) # Vote count, submission date, view count
