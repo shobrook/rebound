@@ -251,15 +251,8 @@ def get_search_results(soup):
             answer_count = int(result.find_all("div", class_="status answered")[0].find_all("strong")[0].text)
         elif result.find_all("div", class_="status answered-accepted") != []: # Has an accepted answer (closed)
             answer_count = int(result.find_all("div", class_="status answered-accepted")[0].find_all("strong")[0].text)
-        elif result.find_all("div", class_="status unanswered") != []: # Has unaccepted anmswer
-            answer_count = int(result.find_all("div", class_="status unanswered")[0].find_all("strong")[0].text)
-        else: # Answer not displayed in search page
-            ans_page=souper(SO_URL + title_container["href"])  # Visit the answer page and get the count directly
-            answer_count =ans_page.find("span", {"itemprop":"answerCount"})
-            if answer_count!=None:
-                answer_count=int(answer_count.text)
-            else:
-                answer_count=0 # No Answers
+        else: # No answers
+            answer_count = 0
 
         search_results.append({
             "Title": title_container["title"],
@@ -312,6 +305,7 @@ def get_question_and_answers(url):
     else:
         question_title = soup.find_all('a', class_="question-hyperlink")[0].get_text()
         question_stats = soup.find("div", class_="js-vote-count").get_text() # Vote count
+
         try:
             question_stats = question_stats + " Votes | " + '|'.join((((soup.find_all("div", class_="module question-stats")[0].get_text())
                 .replace('\n', ' ')).replace("     ", " | ")).split('|')[:2]) # Vote count, submission date, view count
@@ -740,7 +734,7 @@ class App(object):
 
 
     def _handle_input(self, input):
-        if input == "enter": # View answers
+        if input == "enter" or (input[0]=='meta mouse press' and input[1]==1): # View answers   Either press Enter or "ALT + Left Click"
             url = self._get_selected_link()
 
             if url != None:
@@ -761,7 +755,7 @@ class App(object):
                 ])
 
                 self.main_loop.widget = urwid.Frame(body=urwid.Overlay(linebox, self.content_container, "center", ("relative", 60), "middle", 23), footer=menu)
-        elif input in ('b', 'B'): # Open link
+        elif input in ('b', 'B') or (input[0]=='ctrl mouse press' and input[1]==1): # Open link     Either press (B or b) or "CTRL + Left Click"
             url = self._get_selected_link()
 
             if url != None:
