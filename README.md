@@ -14,9 +14,11 @@ Rebound works on MacOS, Linux, and Windows (if you use Cygwin), with binary down
 
 `$ pip install rebound-cli`
 
-or apt-get if you're using Linux:
+or using your distribution's package manager:
 
-`$ sudo apt-get install rebound-cli`
+- on Debian-based distributions: `$ sudo apt-get install rebound-cli`
+
+- on Fedora: `$ sudo dnf copr enable notsag/rebound-cli && sudo dnf install python3-rebound-cli`
 
 ## Usage
 
