@@ -3,7 +3,7 @@ import traceback
 import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname( __file__ ), "..", "rebound"))
-import rebound
+from rebound.rebound.file_attributes import get_error_message
 
 # Constants and helper functions
 EXCEPTION_DETAILS = "Exception details"
@@ -41,6 +41,6 @@ def gen_expected_message(exception_type_str):
     (Warning, "Warning")
 ])
 def test_get_error_message(exception_type, exception_type_str):
-    error_message = rebound.get_error_message(gen_python_exception(exception_type), "python3")
+    error_message = get_error_message(gen_python_exception(exception_type), "python3")
     expected_error_message = gen_expected_message(exception_type_str)
     assert error_message == expected_error_message
