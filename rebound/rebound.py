@@ -22,7 +22,8 @@ from rebound.rebound.constants import (
     SO_URL,
     ASCII_COLOR_CODE,
     SCROLL_ACTIONS,
-    SCROLLBAR_POSITION
+    SCROLLBAR_POSITION,
+    LANGUAGE_COMMAND_MAP,
 )
 
 
@@ -33,20 +34,11 @@ from rebound.rebound.constants import (
 
 def get_language(file_path):
     """Returns the language a file is written in."""
-    if file_path.endswith(".py"):
-        return "python3"
-    elif file_path.endswith(".js"):
-        return "node"
-    elif file_path.endswith(".go"):
-        return "go run"
-    elif file_path.endswith(".rb"):
-        return "ruby"
-    elif file_path.endswith(".java"):
-        return 'javac' # Compile Java Source File
-    elif file_path.endswith(".class"):
-        return 'java' # Run Java Class File
-    else:
-        return '' # Unknown language
+    try:
+        file_extension = file_path.split(".")[-1]
+        return LANGUAGE_COMMAND_MAP[file_extension]
+    except:
+        return ""  # Unknown Language
 
 
 def get_error_message(error, language):
@@ -348,7 +340,6 @@ class Scrollable(urwid.WidgetDecoration):
 
         return canv
 
-
     def keypress(self, size, key):
         if self._forward_keypress:
             ow = self._original_widget
@@ -381,7 +372,6 @@ class Scrollable(urwid.WidgetDecoration):
 
         self._invalidate()
 
-
     def mouse_event(self, size, event, button, col, row, focus):
         ow = self._original_widget
         if hasattr(ow, "mouse_event"):
@@ -390,7 +380,6 @@ class Scrollable(urwid.WidgetDecoration):
             return ow.mouse_event(ow_size, event, button, col, row, focus)
         else:
             return False
-
 
     def _adjust_trim_top(self, canv, size):
         """Adjust self._trim_top according to self._scroll_action"""

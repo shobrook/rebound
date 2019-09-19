@@ -61,3 +61,13 @@ class SCROLL_ACTIONS(Enum):
     SCROLL_TO_END = "to end"
     SCROLLBAR_LEFT = "left"
     SCROLLBAR_RIGHT = "right"
+
+
+LANGUAGE_COMMAND_MAP = {
+    "py": "python3",
+    "js": "node",
+    "go": "go run",
+    "rb": "ruby",
+    "java": "javac",
+    "class": "java"
+}
