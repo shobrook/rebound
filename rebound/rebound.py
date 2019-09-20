@@ -37,7 +37,7 @@ def get_language(file_path):
     try:
         file_extension = file_path.split(".")[-1]
         return LANGUAGE_COMMAND_MAP[file_extension]
-    except:
+    except IndexError:
         return ""  # Unknown Language
 
 
