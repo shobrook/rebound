@@ -304,13 +304,16 @@ def get_question_and_answers(url):
         return "Sorry, Stack Overflow blocked our request. Try again in a couple seconds.", "", "", ""
     else:
         question_title = soup.find_all('a', class_="question-hyperlink")[0].get_text()
-        question_stats = soup.find("div", class_="js-vote-count").get_text() # Vote count
+        print("\n%s%s%s" % (RED, "Some.\n", END))
+        question_stats1 = soup.find('div', itemprop="upvoteCount").get_text() # Vote count
+        question_stats2 = "|" + " Asked " + soup.find('time',itemprop="dateCreated").get_text() # Asked date
 
         try:
-            question_stats = question_stats + " Votes | " + '|'.join((((soup.find_all("div", class_="module question-stats")[0].get_text())
-                .replace('\n', ' ')).replace("     ", " | ")).split('|')[:2]) # Vote count, submission date, view count
+            question_stats = question_stats1 + " Votes | " + '|'.join((((soup.find("div", class_="grid--cell ws-nowrap mb8").get("title"))
+                .replace('\n', ' ')).replace("     ", " | ")).split('|')[:2]) + question_stats2 # Votes, View Count, Asked date 
+            
         except IndexError:
-            question_stats = "Could not load statistics."
+            question_stats = "Could not load statistics %s."%(question_stats1)
 
         question_desc = stylize_code(soup.find_all("div", class_="post-text")[0]) # TODO: Handle duplicates
         question_stats = ' '.join(question_stats.split())
