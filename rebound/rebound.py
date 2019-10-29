@@ -3,19 +3,19 @@
 ##########
 
 
-import urwid
-import re
+import re 
 import sys
 import os
-from bs4 import BeautifulSoup
-import requests
 from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
 import webbrowser
-import time
-from urwid.widget import (BOX, FLOW, FIXED)
 import random
+import requests
+from bs4 import BeautifulSoup
+import urwid
+from urwid.widget import (BOX, FLOW, FIXED)
+
 
 SO_URL = "https://stackoverflow.com"
 
