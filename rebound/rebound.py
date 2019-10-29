@@ -733,8 +733,8 @@ class App(object):
         self.main_loop.run()
 
 
-    def _handle_input(self, input):
-        if input == "enter": # View answers
+    def _handle_input(self, input_val):
+        if input_val == "enter": # View answers
             url = self._get_selected_link()
 
             if url != None:
@@ -755,18 +755,18 @@ class App(object):
                 ])
 
                 self.main_loop.widget = urwid.Frame(body=urwid.Overlay(linebox, self.content_container, "center", ("relative", 60), "middle", 23), footer=menu)
-        elif input in ('b', 'B'): # Open link
+        elif input_val in ('b', 'B'): # Open link
             url = self._get_selected_link()
 
             if url != None:
                 webbrowser.open(url)
-        elif input == "esc": # Close window
+        elif input_val == "esc": # Close window
             if self.viewing_answers:
                 self.main_loop.widget = self.original_widget
                 self.viewing_answers = False
             else:
                 raise urwid.ExitMainLoop()
-        elif input in ('q', 'Q'): # Quit
+        elif input_val in ('q', 'Q'): # Quit
             raise urwid.ExitMainLoop()
 
 
