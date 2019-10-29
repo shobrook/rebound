@@ -83,20 +83,21 @@ USER_AGENTS = [
 
 def get_language(file_path):
     """Returns the language a file is written in."""
+    language = ''
     if file_path.endswith(".py"):
-        return "python3"
+        language = "python3"
     elif file_path.endswith(".js"):
-        return "node"
+        language = "node"
     elif file_path.endswith(".go"):
-        return "go run"
+        language = "go run"
     elif file_path.endswith(".rb"):
-        return "ruby"
+        language = "ruby"
     elif file_path.endswith(".java"):
-        return 'javac' # Compile Java Source File
+        language = 'javac' # Compile Java Source File
     elif file_path.endswith(".class"):
-        return 'java' # Run Java Class File
-    else:
-        return '' # Unknown language
+        language = 'java' # Run Java Class File
+
+    return language
 
 
 def get_error_message(error, language):
@@ -106,8 +107,7 @@ def get_error_message(error, language):
     elif language == "python3":
         if any(e in error for e in ["KeyboardInterrupt", "SystemExit", "GeneratorExit"]): # Non-compiler errors
             return None
-        else:
-            return error.split('\n')[-2].strip()
+        return error.split('\n')[-2].strip()
     elif language == "node":
         return error.split('\n')[4][1:]
     elif language == "go run":
@@ -196,8 +196,7 @@ def execute(command):
 
     if "java" != command[0] and not os.path.isfile(command[1]): # File doesn't exist, for java, command[1] is a class name instead of a file
         return (None, None)
-    else:
-        return (output, errors)
+    return (output, errors)
 
 
 ###############
@@ -277,8 +276,7 @@ def souper(url):
 
     if re.search("\.com/nocaptcha", html.url): # URL is a captcha page
         return None
-    else:
-        return BeautifulSoup(html.text, "html.parser")
+    return BeautifulSoup(html.text, "html.parser")
 
 
 ## Main ##
@@ -292,8 +290,7 @@ def search_stackoverflow(query):
 
     if soup == None:
         return (None, True)
-    else:
-        return (get_search_results(soup), False)
+    return (get_search_results(soup), False)
 
 
 def get_question_and_answers(url):
@@ -438,8 +435,8 @@ class Scrollable(urwid.WidgetDecoration):
             ow_size = self._get_original_widget_size(size)
             row += self._trim_top
             return ow.mouse_event(ow_size, event, button, col, row, focus)
-        else:
-            return False
+
+        return False
 
 
     def _adjust_trim_top(self, canv, size):
@@ -589,8 +586,7 @@ class ScrollBar(urwid.WidgetDecoration):
         combinelist = [(ow_canv, None, True, ow_size[0]), (sb_canv, None, False, sb_width)]
         if self._scrollbar_side != SCROLLBAR_LEFT:
             return urwid.CanvasJoin(combinelist)
-        else:
-            return urwid.CanvasJoin(reversed(combinelist))
+        return urwid.CanvasJoin(reversed(combinelist))
 
 
     @property
@@ -782,8 +778,7 @@ class App(object):
     def _stylize_title(self, search_result):
         if search_result["Answers"] == 1:
             return "%s (1 Answer)" % search_result["Title"]
-        else:
-            return "%s (%s Answers)" % (search_result["Title"], search_result["Answers"])
+        return "%s (%s Answers)" % (search_result["Title"], search_result["Answers"])
 
 
     def _stylize_question(self, title, desc, stats):
