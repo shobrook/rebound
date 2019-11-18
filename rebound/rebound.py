@@ -712,8 +712,10 @@ class App(object):
             ("stats", "light green", "default", "standout"),
             ("menu", "black", "light cyan", "standout"),
             ("reveal focus", "black", "light cyan", "standout"),
+            ("reveal viewed focus", "yellow, bold", "light cyan", "standout"),
             ("no answers", "light red", "default", "standout"),
-            ("code", "brown", "default", "standout")
+            ("code", "brown", "default", "standout"),
+            ("viewed", "yellow", "default", "standout")
         ]
         self.menu = urwid.Text([
             u'\n',
@@ -723,8 +725,8 @@ class App(object):
         ])
 
         results = list(map(lambda result: urwid.AttrMap(SelectableText(self._stylize_title(result)), None, "reveal focus"), self.search_results)) # TODO: Add a wrap='clip' attribute
-        content = urwid.SimpleListWalker(results)
-        self.content_container = urwid.ListBox(content)
+        self.content = urwid.SimpleListWalker(results)
+        self.content_container = urwid.ListBox(self.content)
         layout = urwid.Frame(body=self.content_container, footer=self.menu)
 
         self.main_loop = urwid.MainLoop(layout, self.palette, unhandled_input=self._handle_input)
@@ -753,6 +755,11 @@ class App(object):
                     ("menu", u" B "), ("light gray", u" Open browser "),
                     ("menu", u" Q "), ("light gray", u" Quit"),
                 ])
+
+                # highlight the selected answer
+                _, idx = self.content_container.get_focus()
+                txt = self.content[idx].original_widget.text
+                self.content[idx] = urwid.AttrMap(SelectableText(txt), 'viewed', 'reveal viewed focus')
 
                 self.main_loop.widget = urwid.Frame(body=urwid.Overlay(linebox, self.content_container, "center", ("relative", 60), "middle", 23), footer=menu)
         elif input in ('b', 'B'): # Open link
