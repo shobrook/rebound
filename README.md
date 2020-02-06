@@ -13,6 +13,8 @@ __Featured in:__ [50 Most Popular Python Projects in 2018](https://boostlog.io/@
 Rebound works on MacOS, Linux, and Windows (if you use Cygwin), with binary downloads available for [every release.](https://github.com/shobrook/rebound/releases) You can also install it with pip:
 
 `$ pip install rebound-cli`
+or
+`$ pip3 install rebound-cli`
 
 or apt-get if you're using Linux:
 
