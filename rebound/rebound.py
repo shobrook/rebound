@@ -2,24 +2,27 @@
 ## GLOBALS
 ##########
 
-
-import urwid
+import os
 import re
 import sys
-import os
-from bs4 import BeautifulSoup
-import requests
-from queue import Queue
-from subprocess import PIPE, Popen
-from threading import Thread
-import webbrowser
+
 import time
-from urwid.widget import (BOX, FLOW, FIXED)
+import urwid
 import random
+
+import requests
+import webbrowser
+
+from queue import Queue
+from threading import Thread
+
+from bs4 import BeautifulSoup
+from subprocess import PIPE, Popen
+from urwid.widget import (BOX, FLOW, FIXED)
 
 SO_URL = "https://stackoverflow.com"
 
-# ASCII color codes
+# ascii color codesuse from config.colore_codes
 GREEN = '\033[92m'
 GRAY = '\033[90m'
 CYAN = '\033[36m'
@@ -29,7 +32,7 @@ END = '\033[0m'
 UNDERLINE = '\033[4m'
 BOLD = '\033[1m'
 
-# Scroll actions
+# scroll actions use from config.action
 SCROLL_LINE_UP = "line up"
 SCROLL_LINE_DOWN = "line down"
 SCROLL_PAGE_UP = "page up"
@@ -37,7 +40,7 @@ SCROLL_PAGE_DOWN = "page down"
 SCROLL_TO_TOP = "to top"
 SCROLL_TO_END = "to end"
 
-# Scrollbar positions
+# scrollbar positions use from config.position
 SCROLLBAR_LEFT = "left"
 SCROLLBAR_RIGHT = "right"
 
@@ -520,6 +523,7 @@ class Scrollable(urwid.WidgetDecoration):
     @property
     def scroll_ratio(self):
         return self._rows_max_cached / self._rows_max_displayable
+
 
 class ScrollBar(urwid.WidgetDecoration):
     # TODO: Change scrollbar size and color(?)
