@@ -1,0 +1,6 @@
+SCROLL_LINE_UP = "line up"
+SCROLL_LINE_DOWN = "line down"
+SCROLL_PAGE_UP = "page up"
+SCROLL_PAGE_DOWN = "page down"
+SCROLL_TO_TOP = "to top"
+SCROLL_TO_END = "to end"
