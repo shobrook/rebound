@@ -727,7 +727,7 @@ class App(object):
 
 
     def _handle_input(self, input):
-        if input == "enter": # View answers
+        if input == "enter" or (input[0]=='meta mouse press' and input[1]==1): # View answers   Either press Enter or "ALT + Left Click"
             url = self._get_selected_link()
 
             if url != None:
@@ -748,7 +748,7 @@ class App(object):
                 ])
 
                 self.main_loop.widget = urwid.Frame(body=urwid.Overlay(linebox, self.content_container, "center", ("relative", 60), "middle", 23), footer=menu)
-        elif input in ('b', 'B'): # Open link
+        elif input in ('b', 'B') or (input[0]=='ctrl mouse press' and input[1]==1): # Open link     Either press (B or b) or "CTRL + Left Click"
             url = self._get_selected_link()
 
             if url != None:
