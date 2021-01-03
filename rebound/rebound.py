@@ -868,6 +868,3 @@ def main():
             print("\n%s%s%s" % (CYAN, "No error detected :)\n", END))
 
     return
-
-
-main()
