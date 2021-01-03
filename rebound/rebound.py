@@ -304,18 +304,11 @@ def get_question_and_answers(url):
         return "Sorry, Stack Overflow blocked our request. Try again in a couple seconds.", "", "", ""
     else:
         question_title = soup.find_all('a', class_="question-hyperlink")[0].get_text()
-        question_stats = soup.find("div", class_="js-vote-count").get_text() # Vote count
+        question_stats = soup.find("div", attrs={"itemprop": "upvoteCount"}).get_text() # Vote count
+        question_stats += " Votes | Asked " + soup.find("time", attrs={"itemprop": "dateCreated"}).get_text() # Date created
+        question_desc = stylize_code(soup.find_all("div", class_="s-prose js-post-body")[0]) # TODO: Handle duplicates
 
-        try:
-            question_stats = question_stats + " Votes | " + '|'.join((((soup.find_all("div", class_="module question-stats")[0].get_text())
-                .replace('\n', ' ')).replace("     ", " | ")).split('|')[:2]) # Vote count, submission date, view count
-        except IndexError:
-            question_stats = "Could not load statistics."
-
-        question_desc = stylize_code(soup.find_all("div", class_="post-text")[0]) # TODO: Handle duplicates
-        question_stats = ' '.join(question_stats.split())
-
-        answers = [stylize_code(answer) for answer in soup.find_all("div", class_="post-text")][1:]
+        answers = [stylize_code(answer) for answer in soup.find_all("div", class_="s-prose js-post-body")][1:]
         if len(answers) == 0:
             answers.append(urwid.Text(("no answers", u"\nNo answers for this question.")))
 
@@ -875,3 +868,6 @@ def main():
             print("\n%s%s%s" % (CYAN, "No error detected :)\n", END))
 
     return
+
+
+main()
