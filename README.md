@@ -1,6 +1,6 @@
 # rebound
 
-Rebound is a command-line tool that instantly fetches Stack Overflow results when you get a compiler error. Just use the `rebound` command to execute your file.
+Rebound is a command-line tool that instantly fetches Stack Overflow results when an exception is thrown. Just use the `rebound` command to execute your file.
 
 ![Placeholder Demo](docs/demo.gif)
 
@@ -10,7 +10,7 @@ __Featured in:__ [50 Most Popular Python Projects in 2018](https://boostlog.io/@
 
 >Requires Python 3.0 or higher.
 
-Rebound works on MacOS, Linux, and Windows (if you use Cygwin), with binary downloads available for [every release.](https://github.com/shobrook/rebound/releases) You can also install it with pip:
+Rebound works on MacOS, Linux, and Windows (if you use Cygwin). You can install it with pip:
 
 `$ pip install rebound-cli`
 
@@ -20,7 +20,7 @@ or apt-get if you're using Linux:
 
 ## Usage
 
-Running a file with `rebound` is just as easy as compiling it normally:
+Running a file with `rebound` is just as easy as running it normally:
 
 `$ rebound [file_path]`
 
@@ -30,14 +30,14 @@ __Supported file types:__ Python, Node.js, Ruby, Golang, and Java.
 
 ## Contributing
 
-To make a contribution, fork the repo, make your changes and then submit a pull request. Please try to adhere to the existing style. If you've discovered a bug or have a feature request, create an [issue](https://github.com/shobrook/rebound/issues/new) and I'll take care of it!
+To make a contribution, fork the repo, make your changes and then submit a pull request. Please try to adhere to the existing style. If you've discovered a bug or have a feature request, create an [issue](https://github.com/shobrook/rebound/issues/new).
 
 __Pending Features:__
 * Improved text formatting (i.e. for duplicate questions, markdown, blockquotes, clickable links, etc.)
 * Improved search result accuracy by extracting potential search terms from the stack trace
 * Support for more languages
 
-## Technologies
+## How it Works
 
 Rebound is written in Python and built on Urwid. Beautiful Soup is used to scrape Stack Overflow content and subprocess for catching compiler errors.
 
