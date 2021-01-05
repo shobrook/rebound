@@ -800,6 +800,15 @@ class App(object):
 
 ## Helper Functions ##
 
+# May not be necessary but I found that my environment needed this to be set up
+# I don't know if this is needed for other OS
+def windows_color():
+    """Checks OS and sets Windows to utilize colored text in cmd."""
+    opSys = sys.platform
+    
+    if opSys == "win32":
+        os.system('color') # Returns 1 when ran in python cmd but it works
+
 
 def confirm(question):
     """Prompts a given question and handles user input."""
@@ -830,6 +839,7 @@ def print_help():
 
 
 def main():
+    windows_color()
     if len(sys.argv) == 1 or sys.argv[1].lower() == "-h" or sys.argv[1].lower() == "--help":
         print_help()
     elif sys.argv[1].lower() == "-q" or sys.argv[1].lower() == "--query":
