@@ -275,7 +275,7 @@ def souper(url):
                                             "Please check that you are connected to the internet.\n", END))
         sys.exit(1)
 
-    if re.search("\.com/nocaptcha", html.url): # URL is a captcha page
+    if re.search(r'\.com/nocaptcha', html.url): # URL is a captcha page
         return None
     else:
         return BeautifulSoup(html.text, "html.parser")
@@ -382,7 +382,7 @@ class Scrollable(urwid.WidgetDecoration):
 
         # Disable cursor display if cursor is outside of visible canvas parts
         if canv.cursor is not None:
-            curscol, cursrow = canv.cursor
+            _, cursrow = canv.cursor
             if cursrow >= maxrow or cursrow < 0:
                 canv.cursor = None
 
@@ -440,7 +440,7 @@ class Scrollable(urwid.WidgetDecoration):
         action = self._scroll_action
         self._scroll_action = None
 
-        maxcol, maxrow = size
+        _, maxrow = size
         trim_top = self._trim_top
         canv_rows = canv.rows()
 
@@ -472,7 +472,7 @@ class Scrollable(urwid.WidgetDecoration):
 
         if self._old_cursor_coords is not None and self._old_cursor_coords != canv.cursor:
             self._old_cursor_coords = None
-            curscol, cursrow = canv.cursor
+            _, cursrow = canv.cursor
             if cursrow < self._trim_top:
                 self._trim_top = cursrow
             elif cursrow >= self._trim_top + maxrow:
@@ -771,7 +771,7 @@ class App(object):
 
 
     def _get_selected_link(self):
-        focus_widget, idx = self.content_container.get_focus() # Gets selected item
+        focus_widget, _ = self.content_container.get_focus() # Gets selected item
         title = focus_widget.base_widget.text
 
         for result in self.search_results:
