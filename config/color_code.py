@@ -1,0 +1,8 @@
+GREEN = '\033[92m'
+GRAY = '\033[90m'
+CYAN = '\033[36m'
+RED = '\033[31m'
+YELLOW = '\033[33m'
+END = '\033[0m'
+UNDERLINE = '\033[4m'
+BOLD = '\033[1m'
