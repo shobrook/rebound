@@ -85,41 +85,39 @@ def get_language(file_path):
     """Returns the language a file is written in."""
     if file_path.endswith(".py"):
         return "python3"
-    elif file_path.endswith(".js"):
+    if file_path.endswith(".js"):
         return "node"
-    elif file_path.endswith(".go"):
+    if file_path.endswith(".go"):
         return "go run"
-    elif file_path.endswith(".rb"):
+    if file_path.endswith(".rb"):
         return "ruby"
-    elif file_path.endswith(".java"):
+    if file_path.endswith(".java"):
         return 'javac'  # Compile Java Source File
-    elif file_path.endswith(".class"):
+    if file_path.endswith(".class"):
         return 'java'  # Run Java Class File
-    else:
-        return ''  # Unknown language
+    return ''  # Unknown language
 
 
 def get_error_message(error, language):
     """Filters the stack trace from stderr and returns only the error message."""
     if error == '':
         return None
-    elif language == "python3":
+    if language == "python3":
         # Non-compiler errors
         if any(e in error for e in ["KeyboardInterrupt", "SystemExit", "GeneratorExit"]):
             return None
-        else:
-            return error.split('\n')[-2].strip()
-    elif language == "node":
+        return error.split('\n')[-2].strip()
+    if language == "node":
         return error.split('\n')[4][1:]
-    elif language == "go run":
+    if language == "go run":
         return error.split('\n')[1].split(": ", 1)[1][1:]
-    elif language == "ruby":
+    if language == "ruby":
         error_message = error.split('\n')[0]
         return error_message[error_message.rfind(": ") + 2:]
-    elif language == "javac":
+    if language == "javac":
         m = re.search(r'.*error:(.*)', error.split('\n')[0])
         return m.group(1) if m else None
-    elif language == "java":
+    if language == "java":
         for line in error.split('\n'):
             # Multiple error formats
             m = re.search(r'.*(Exception|Error):(.*)', line)
@@ -201,8 +199,7 @@ def execute(command):
     # File doesn't exist, for java, command[1] is a class name instead of a file
     if "java" != command[0] and not os.path.isfile(command[1]):
         return (None, None)
-    else:
-        return (output, errors)
+    return (output, errors)
 
 
 ###############
@@ -287,8 +284,7 @@ def souper(url):
 
     if re.search("\.com/nocaptcha", html.url):  # URL is a captcha page
         return None
-    else:
-        return BeautifulSoup(html.text, "html.parser")
+    return BeautifulSoup(html.text, "html.parser")
 
 
 ## Main ##
@@ -303,8 +299,7 @@ def search_stackoverflow(query):
 
     if soup == None:
         return (None, True)
-    else:
-        return (get_search_results(soup), False)
+    return (get_search_results(soup), False)
 
 
 def get_question_and_answers(url):
