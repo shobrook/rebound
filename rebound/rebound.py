@@ -41,6 +41,8 @@ SCROLL_TO_END = "to end"
 SCROLLBAR_LEFT = "left"
 SCROLLBAR_RIGHT = "right"
 
+
+# Get a single user agent from the list
 USER_AGENTS = [
     "Mozilla/5.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; AcooBrowser; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
     "Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)",
@@ -74,6 +76,8 @@ USER_AGENTS = [
     'Mozilla/5.0 (Windows NT 6.1; Win64; x64; Trident/7.0; rv:11.0) like Gecko',
     'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
 ]
+
+headers = {"User-Agent": random.choice(USER_AGENTS)}
 
 
 ##################
@@ -276,7 +280,7 @@ def souper(url):
 
     try:
         html = requests.get(
-            url, headers={"User-Agent": random.choice(USER_AGENTS)})
+            url, headers)
     except requests.exceptions.RequestException:
         sys.stdout.write("\n%s%s%s" % (RED, "Rebound was unable to fetch Stack Overflow results. "
                                             "Please check that you are connected to the internet.\n", END))
