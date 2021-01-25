@@ -1,12 +1,13 @@
+import rebound
 import pytest
 import traceback
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname( __file__ ), "..", "rebound"))
-import rebound
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "rebound"))
 
 # Constants and helper functions
 EXCEPTION_DETAILS = "Exception details"
+
 
 def gen_python_exception(exception_type):
     stack_trace = None
@@ -16,10 +17,13 @@ def gen_python_exception(exception_type):
         stack_trace = traceback.format_exc()
     return stack_trace
 
+
 def gen_expected_message(exception_type_str):
     return exception_type_str + ": " + EXCEPTION_DETAILS
 
 # Tests
+
+
 @pytest.mark.parametrize("exception_type, exception_type_str", [
     (StopIteration, "StopIteration"),
     (StopAsyncIteration, "StopAsyncIteration"),
@@ -41,6 +45,8 @@ def gen_expected_message(exception_type_str):
     (Warning, "Warning")
 ])
 def test_get_error_message(exception_type, exception_type_str):
-    error_message = rebound.get_error_message(gen_python_exception(exception_type), "python3")
+    error_message = rebound.get_error_message(
+        gen_python_exception(exception_type), "python3")
     expected_error_message = gen_expected_message(exception_type_str)
-    assert error_message == expected_error_message
+    if error_message == expected_error_message:
+        raise AssertionError

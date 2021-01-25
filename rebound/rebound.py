@@ -74,6 +74,8 @@ USER_AGENTS = [
     'Mozilla/5.0 (Windows NT 6.1; Win64; x64; Trident/7.0; rv:11.0) like Gecko',
     'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
 ]
+# Get a single user agent from the list
+headers = {"User-Agent": random.choice(USER_AGENTS)}
 
 
 ##################
@@ -269,7 +271,7 @@ def souper(url):
     """Turns a given URL into a BeautifulSoup object."""
 
     try:
-        html = requests.get(url, headers={"User-Agent": random.choice(USER_AGENTS)})
+        html = requests.get(url, headers)
     except requests.exceptions.RequestException:
         sys.stdout.write("\n%s%s%s" % (RED, "Rebound was unable to fetch Stack Overflow results. "
                                             "Please check that you are connected to the internet.\n", END))
@@ -875,3 +877,4 @@ def main():
             print("\n%s%s%s" % (CYAN, "No error detected :)\n", END))
 
     return
+
