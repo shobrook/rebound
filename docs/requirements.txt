@@ -3,3 +3,4 @@ requests
 urllib3
 urwid
 search_engine_parser
+fake_useragent
