@@ -23,7 +23,7 @@ def _get_caller_path():
     #module name from this path
     caller_path = os.path.dirname(calling_script.__file__)
     return(caller_path)                
-    #check and accept only class,func or val as object.
+
         
 def _main():
     #Get process id of running script
