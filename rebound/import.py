@@ -42,7 +42,6 @@ if __name__ != '__main__':
     _caller_path = _get_caller_path()    
     #Open Logger
     __logger = open( os.path.join(_caller_path,'log.err'),'w')
-    #assign global default comment methods
     _main()
     
     
