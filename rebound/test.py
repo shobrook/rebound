@@ -11,8 +11,8 @@ BOLD = '\033[1m'
 END = '\033[0m'
 CYAN = '\033[36m'
 
-parser = argparse.ArgumentParser (prog='Rebound',description='Command-line tool that automatically searches Stack Overflow and displays results in your terminal when you get a compiler error.')
-parser.add_argument('-v','--version', action='version', version='%(prog)s 2.0')
+parser = argparse.ArgumentParser (prog='Rebound',description='Command-line tool that automatically searches Stack Overflow and displays results in your terminal when you get a compiler error.\n Made by @shobrook')
+parser.add_argument('-v','--version', action='version', version='%(prog)s 1.1.9a1')
 parser.add_argument("-s","--script",help="Run Script from Terminal")
 parser.add_argument('-q','--query',help='Query stackoverflow with Error message ')
 subparser = parser.add_subparsers(dest='command')
