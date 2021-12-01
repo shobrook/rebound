@@ -40,7 +40,6 @@ def _main():
 if __name__ != '__main__':
     __module_path__ = os.path.dirname(__file__)
     _caller_path = _get_caller_path()    
-    __python_path__ = sys.executable   
     #Open Logger
     __logger = open( os.path.join(_caller_path,'log.err'),'w')
     #assign global default comment methods
