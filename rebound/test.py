@@ -85,12 +85,13 @@ def MonitorProcess():#ErrorLog,pid):
   if ValidError is not None:
         print(RED+BOLD+ErrorMessage,file=sys.stdout)
         site = 'site:stackoverflow.com'
-        query = "%s %s %s" % ('python3', ValidError,site)
+        query = "%s %s %s" % ('python', ValidError,site)
         search_results = search_google(query)
         if search_results != []:
             if confirm("\nDisplay Stack Overflow results?"):
                 #App(search_results) # Opens interface
-                print(search_results)
+                #print([i['title'] for i in search_results])
+                print([result for result in search_results]) 
         else:
             print("\n%s%s%s" % (RED, "No Google results found.\n", END))
   return 

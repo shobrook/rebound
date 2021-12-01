@@ -309,7 +309,7 @@ def search_google(query):
                                             +str(e)+"\n Try again Later.", END))
        sys.exit(1)
 
-    return SearchDict  
+    return [result for result in SearchDict] 
 
 
 def get_question_and_answers(url):
@@ -856,14 +856,14 @@ def main():
         #search_results, captcha = search_stackoverflow(query)
         search_results = search_google(query)
 
-        #if search_results != []:
+        if search_results != []:
 
-        if search_results != None:
             # if captcha:
             #     print("\n%s%s%s" % (RED, "Sorry, Stack Overflow blocked our request. Try again in a minute.\n", END))
             #     return
             # else:
                 App(search_results) # Opens interface
+        #SolveIt        
         else:
             print("\n%s%s%s" % (RED, "No Google results found.\n", END))
     else:
