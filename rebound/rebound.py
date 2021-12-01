@@ -13,11 +13,8 @@ from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
 import webbrowser
-import time
 from urwid.widget import (BOX, FLOW, FIXED)
-import random
 from search_engine_parser.core.engines.google import Search as GoogleSearch
-import argparse
 from fake_useragent import UserAgent
 
 
@@ -863,8 +860,7 @@ def main():
             #     print("\n%s%s%s" % (RED, "Sorry, Stack Overflow blocked our request. Try again in a minute.\n", END))
             #     return
             # else:
-                App(search_results) # Opens interface
-        #SolveIt        
+                App(search_results) # Opens interface      
         else:
             print("\n%s%s%s" % (RED, "No Google results found.\n", END))
     else:
