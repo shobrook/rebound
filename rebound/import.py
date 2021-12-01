@@ -6,7 +6,7 @@ import inspect
 #__all__=['']
 
 #Using memcached for faster implementation of distributed memory
-"""Function to get the filename and path to Python script calling Debuggy Module
+"""Function to get the filename and path to Python script calling Rebound Module
     get lines from python source file while attempting to optimize internally.
 """
 def _get_caller_stack():
