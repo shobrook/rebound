@@ -14,7 +14,7 @@ with open("README.md", encoding="utf-8") as file:
 
 setup(
     name="rebound-cli",
-    version="2.0.0",
+    version="2.1.0",
     description="Command-line tool that automatically fetches Stack Overflow results after compiler errors",
     #long_description=readme,
     #long_description_content_type="text/markdown",
