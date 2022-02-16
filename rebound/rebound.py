@@ -298,6 +298,7 @@ def souper(url):
 
 def search_google(query):
     try:
+      query = query+" :"+SO_URL[8:]
       google_search = GoogleSearch()
       SearchArgs=(query,1)
       google_search.clear_cache()
@@ -851,6 +852,7 @@ def main():
         print_help()
     elif sys.argv[1].lower() == "-q" or sys.argv[1].lower() == "--query":
         query = ' '.join(sys.argv[2:])
+
         #search_results, captcha = search_stackoverflow(query)
         search_results = search_google(query)
 
@@ -879,8 +881,7 @@ def main():
         error_msg = get_error_message(error, language) # Prepares error message for search
         if error_msg != None:
             language = 'java' if language == 'javac' else language # Fix language compiler command
-            site = 'site:stackoverflow.com'
-            query = "%s %s %s" % (language, error_msg,site)
+            query = "%s %s %s" % (language, error_msg)
             #search_results, captcha = search_stackoverflow(query)
             search_results = search_google(query)
 
