@@ -1,4 +1,5 @@
 # rebound
+# rebound
 
 Rebound is a command-line tool that instantly fetches Stack Overflow results when an exception is thrown. Just use the `rebound` command to execute your file.
 
