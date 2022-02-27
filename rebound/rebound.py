@@ -3,77 +3,28 @@
 ##########
 
 
-import urwid
+import os
+import random
 import re
 import sys
-import os
-from bs4 import BeautifulSoup
-import requests
+import webbrowser
 from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
-import webbrowser
-import time
+
+import requests
+import urwid
+from bs4 import BeautifulSoup
 from urwid.widget import (BOX, FLOW, FIXED)
-import random
 
-SO_URL = "https://stackoverflow.com"
-
-# ASCII color codes
-GREEN = '\033[92m'
-GRAY = '\033[90m'
-CYAN = '\033[36m'
-RED = '\033[31m'
-YELLOW = '\033[33m'
-END = '\033[0m'
-UNDERLINE = '\033[4m'
-BOLD = '\033[1m'
-
-# Scroll actions
-SCROLL_LINE_UP = "line up"
-SCROLL_LINE_DOWN = "line down"
-SCROLL_PAGE_UP = "page up"
-SCROLL_PAGE_DOWN = "page down"
-SCROLL_TO_TOP = "to top"
-SCROLL_TO_END = "to end"
-
-# Scrollbar positions
-SCROLLBAR_LEFT = "left"
-SCROLLBAR_RIGHT = "right"
-
-USER_AGENTS = [
-    "Mozilla/5.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; AcooBrowser; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
-    "Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)",
-    "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN) AppleWebKit/523.15 (KHTML, like Gecko, Safari/419.3) Arora/0.3 (Change: 287 c9dfb30)",
-    "Mozilla/5.0 (X11; U; Linux; en-US) AppleWebKit/527+ (KHTML, like Gecko, Safari/419.3) Arora/0.6",
-    "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.2pre) Gecko/20070215 K-Ninja/2.1.1",
-    "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9) Gecko/20080705 Firefox/3.0 Kapiko/3.0",
-    "Mozilla/5.0 (X11; Linux i686; U;) Gecko/20070322 Firefox/59",
-    "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.8) Gecko Fedora/1.9.0.8-1.fc10 Kazehakase/0.5.6",
-    "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/535.20 (KHTML, like Gecko) Chrome/19.0.1036.7 Safari/535.20",
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 5.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
-    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-    'Mozilla/4.0 (compatible; MSIE 9.0; Windows NT 6.1)',
-    'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko',
-    'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)',
-    'Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko',
-    'Mozilla/5.0 (Windows NT 6.2; WOW64; Trident/7.0; rv:11.0) like Gecko',
-    'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko',
-    'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0)',
-    'Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; rv:11.0) like Gecko',
-    'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)',
-    'Mozilla/5.0 (Windows NT 6.1; Win64; x64; Trident/7.0; rv:11.0) like Gecko',
-    'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
-]
+from rebound.rebound.constants import (
+    USER_AGENTS,
+    SO_URL,
+    ASCII_COLOR_CODE,
+    SCROLL_ACTIONS,
+    SCROLLBAR_POSITION,
+    LANGUAGE_COMMAND_MAP,
+)
 
 
 ##################
@@ -83,20 +34,11 @@ USER_AGENTS = [
 
 def get_language(file_path):
     """Returns the language a file is written in."""
-    if file_path.endswith(".py"):
-        return "python3"
-    elif file_path.endswith(".js"):
-        return "node"
-    elif file_path.endswith(".go"):
-        return "go run"
-    elif file_path.endswith(".rb"):
-        return "ruby"
-    elif file_path.endswith(".java"):
-        return 'javac' # Compile Java Source File
-    elif file_path.endswith(".class"):
-        return 'java' # Run Java Class File
-    else:
-        return '' # Unknown language
+    try:
+        file_extension = file_path.split(".")[-1]
+        return LANGUAGE_COMMAND_MAP[file_extension]
+    except IndexError:
+        return ""  # Unknown Language
 
 
 def get_error_message(error, language):
@@ -271,8 +213,8 @@ def souper(url):
     try:
         html = requests.get(url, headers={"User-Agent": random.choice(USER_AGENTS)})
     except requests.exceptions.RequestException:
-        sys.stdout.write("\n%s%s%s" % (RED, "Rebound was unable to fetch Stack Overflow results. "
-                                            "Please check that you are connected to the internet.\n", END))
+        sys.stdout.write("\n%s%s%s" % (ASCII_COLOR_CODE.RED, "Rebound was unable to fetch Stack Overflow results. "
+                                            "Please check that you are connected to the internet.\n", SCROLLBAR_POSITION.END))
         sys.exit(1)
 
     if re.search("\.com/nocaptcha", html.url): # URL is a captcha page
@@ -391,7 +333,6 @@ class Scrollable(urwid.WidgetDecoration):
 
         return canv
 
-
     def keypress(self, size, key):
         if self._forward_keypress:
             ow = self._original_widget
@@ -408,22 +349,21 @@ class Scrollable(urwid.WidgetDecoration):
         # Handle up/down, page up/down, etc
         command_map = self._command_map
         if command_map[key] == urwid.CURSOR_UP:
-            self._scroll_action = SCROLL_LINE_UP
+            self._scroll_action = SCROLL_ACTIONS.SCROLL_LINE_UP
         elif command_map[key] == urwid.CURSOR_DOWN:
-            self._scroll_action = SCROLL_LINE_DOWN
+            self._scroll_action = SCROLL_ACTIONS.SCROLL_LINE_DOWN
         elif command_map[key] == urwid.CURSOR_PAGE_UP:
-            self._scroll_action = SCROLL_PAGE_UP
+            self._scroll_action = SCROLL_ACTIONS.SCROLL_PAGE_UP
         elif command_map[key] == urwid.CURSOR_PAGE_DOWN:
-            self._scroll_action = SCROLL_PAGE_DOWN
+            self._scroll_action = SCROLL_ACTIONS.SCROLL_PAGE_DOWN
         elif command_map[key] == urwid.CURSOR_MAX_LEFT: # "home"
-            self._scroll_action = SCROLL_TO_TOP
+            self._scroll_action = SCROLL_ACTIONS.SCROLL_TO_TOP
         elif command_map[key] == urwid.CURSOR_MAX_RIGHT: # "end"
-            self._scroll_action = SCROLL_TO_END
+            self._scroll_action = SCROLL_ACTIONS.SCROLL_TO_END
         else:
             return key
 
         self._invalidate()
-
 
     def mouse_event(self, size, event, button, col, row, focus):
         ow = self._original_widget
@@ -433,7 +373,6 @@ class Scrollable(urwid.WidgetDecoration):
             return ow.mouse_event(ow_size, event, button, col, row, focus)
         else:
             return False
-
 
     def _adjust_trim_top(self, canv, size):
         """Adjust self._trim_top according to self._scroll_action"""
@@ -455,17 +394,17 @@ class Scrollable(urwid.WidgetDecoration):
         def ensure_bounds(new_trim_top):
             return max(0, min(canv_rows - maxrow, new_trim_top))
 
-        if action == SCROLL_LINE_UP:
+        if action == SCROLL_ACTIONS.SCROLL_LINE_UP:
             self._trim_top = ensure_bounds(trim_top - 1)
-        elif action == SCROLL_LINE_DOWN:
+        elif action == SCROLL_ACTIONS.SCROLL_LINE_DOWN:
             self._trim_top = ensure_bounds(trim_top + 1)
-        elif action == SCROLL_PAGE_UP:
+        elif action == SCROLL_ACTIONS.SCROLL_PAGE_UP:
             self._trim_top = ensure_bounds(trim_top - maxrow+1)
-        elif action == SCROLL_PAGE_DOWN:
+        elif action == SCROLL_ACTIONS.SCROLL_PAGE_DOWN:
             self._trim_top = ensure_bounds(trim_top + maxrow-1)
-        elif action == SCROLL_TO_TOP:
+        elif action == SCROLL_ACTIONS.SCROLL_TO_TOP:
             self._trim_top = 0
-        elif action == SCROLL_TO_END:
+        elif action == SCROLL_ACTIONS.SCROLL_TO_END:
             self._trim_top = canv_rows - maxrow
         else:
             self._trim_top = ensure_bounds(trim_top)
@@ -526,7 +465,7 @@ class ScrollBar(urwid.WidgetDecoration):
 
 
     def __init__(self, widget, thumb_char=u'\u2588', trough_char=' ',
-                 side=SCROLLBAR_RIGHT, width=1):
+                 side=SCROLLBAR_POSITION.SCROLLBAR_RIGHT, width=1):
         """Box widget that adds a scrollbar to `widget`."""
         self.__super.__init__(widget)
         self._thumb_char = thumb_char
@@ -580,7 +519,7 @@ class ScrollBar(urwid.WidgetDecoration):
         ])
 
         combinelist = [(ow_canv, None, True, ow_size[0]), (sb_canv, None, False, sb_width)]
-        if self._scrollbar_side != SCROLLBAR_LEFT:
+        if self._scrollbar_side != SCROLLBAR_POSITION.SCROLLBAR_LEFT:
             return urwid.CanvasJoin(combinelist)
         else:
             return urwid.CanvasJoin(reversed(combinelist))
@@ -604,7 +543,7 @@ class ScrollBar(urwid.WidgetDecoration):
 
     @scrollbar_side.setter
     def scrollbar_side(self, side):
-        if side not in (SCROLLBAR_LEFT, SCROLLBAR_RIGHT):
+        if side not in (SCROLLBAR_POSITION.SCROLLBAR_LEFT, SCROLLBAR_POSITION.SCROLLBAR_RIGHT):
             raise ValueError("scrollbar_side must be 'left' or 'right', not %r" % side)
         self._scrollbar_side = side
         self._invalidate()
@@ -628,9 +567,9 @@ class ScrollBar(urwid.WidgetDecoration):
 
     @property
     def scrollbar_column(self):
-        if self.scrollbar_side == SCROLLBAR_LEFT:
+        if self.scrollbar_side == SCROLLBAR_POSITION.SCROLLBAR_LEFT:
             return 0
-        if self.scrollbar_side == SCROLLBAR_RIGHT:
+        if self.scrollbar_side == SCROLLBAR_POSITION.SCROLLBAR_RIGHT:
             return self._original_widget_size[0]
 
     def keypress(self, size, key):
@@ -808,7 +747,7 @@ def confirm(question):
     prompt = " [Y/n] "
 
     while True:
-        print(BOLD + CYAN + question + prompt + END)
+        print(ASCII_COLOR_CODE.BOLD + ASCII_COLOR_CODE.CYAN + question + prompt + SCROLLBAR_POSITION.END)
         choice = input().lower()
         if choice in valid:
             return valid[choice]
@@ -818,12 +757,13 @@ def confirm(question):
 
 def print_help():
     """Prints usage instructions."""
-    print("%sRebound, V1.1.9a1 - Made by @shobrook%s\n" % (BOLD, END))
+    print("%sRebound, V1.1.9a1 - Made by @shobrook%s\n" % (ASCII_COLOR_CODE.BOLD, SCROLLBAR_POSITION.END))
     print("Command-line tool that automatically searches Stack Overflow and displays results in your terminal when you get a compiler error.")
-    print("\n\n%sUsage:%s $ rebound %s[file_name]%s\n" % (UNDERLINE, END, YELLOW, END))
-    print("\n$ python3 %stest.py%s   =>   $ rebound %stest.py%s" % (YELLOW, END, YELLOW, END))
-    print("\n$ node %stest.js%s     =>   $ rebound %stest.js%s\n" % (YELLOW, END, YELLOW, END))
-    print("\nIf you just want to query Stack Overflow, use the -q parameter: $ rebound -q %sWhat is an array comprehension?%s\n\n" % (YELLOW, END))
+    print("\n\n%sUsage:%s $ rebound %s[file_name]%s\n" % (SCROLLBAR_POSITION.UNDERLINE, SCROLLBAR_POSITION.END, ASCII_COLOR_CODE.YELLOW, SCROLLBAR_POSITION.END))
+    print("\n$ python3 %stest.py%s   =>   $ rebound %stest.py%s" % (ASCII_COLOR_CODE.YELLOW, SCROLLBAR_POSITION.END, ASCII_COLOR_CODE.YELLOW, SCROLLBAR_POSITION.END))
+    print("\n$ node %stest.js%s     =>   $ rebound %stest.js%s\n" % (ASCII_COLOR_CODE.YELLOW, SCROLLBAR_POSITION.END, ASCII_COLOR_CODE.YELLOW, SCROLLBAR_POSITION.END))
+    print("\nIf you just want to query Stack Overflow, use the -q parameter: $ rebound -q %sWhat is an array comprehension?%s\n\n" % (
+    ASCII_COLOR_CODE.YELLOW, SCROLLBAR_POSITION.END))
 
 
 ## Main ##
@@ -838,16 +778,16 @@ def main():
 
         if search_results != []:
             if captcha:
-                print("\n%s%s%s" % (RED, "Sorry, Stack Overflow blocked our request. Try again in a minute.\n", END))
+                print("\n%s%s%s" % (ASCII_COLOR_CODE.RED, "Sorry, Stack Overflow blocked our request. Try again in a minute.\n", SCROLLBAR_POSITION.END))
                 return
             else:
                 App(search_results) # Opens interface
         else:
-            print("\n%s%s%s" % (RED, "No Stack Overflow results found.\n", END))
+            print("\n%s%s%s" % (ASCII_COLOR_CODE.RED, "No Stack Overflow results found.\n", SCROLLBAR_POSITION.END))
     else:
         language = get_language(sys.argv[1].lower()) # Gets the language name
         if language == '': # Unknown language
-            print("\n%s%s%s" % (RED, "Sorry, Rebound doesn't support this file type.\n", END))
+            print("\n%s%s%s" % (ASCII_COLOR_CODE.RED, "Sorry, Rebound doesn't support this file type.\n", SCROLLBAR_POSITION.END))
             return
 
         file_path = sys.argv[1:]
@@ -865,13 +805,14 @@ def main():
 
             if search_results != []:
                 if captcha:
-                    print("\n%s%s%s" % (RED, "Sorry, Stack Overflow blocked our request. Try again in a minute.\n", END))
+                    print("\n%s%s%s" % (
+                    ASCII_COLOR_CODE.RED, "Sorry, Stack Overflow blocked our request. Try again in a minute.\n", ASCII_COLOR_CODE.END))
                     return
                 elif confirm("\nDisplay Stack Overflow results?"):
                     App(search_results) # Opens interface
             else:
-                print("\n%s%s%s" % (RED, "No Stack Overflow results found.\n", END))
+                print("\n%s%s%s" % (ASCII_COLOR_CODE.RED, "No Stack Overflow results found.\n", SCROLLBAR_POSITION.END))
         else:
-            print("\n%s%s%s" % (CYAN, "No error detected :)\n", END))
+            print("\n%s%s%s" % (ASCII_COLOR_CODE.CYAN, "No error detected :)\n", SCROLLBAR_POSITION.END))
 
     return
